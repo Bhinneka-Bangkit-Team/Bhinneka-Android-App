@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".OnboardingActivity">
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.rd.PageIndicatorView
+        android:id="@+id/indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="120dp"
+        app:piv_animationType="worm"
+        app:piv_radius="5dp"
+        app:piv_selectedColor="@color/blue"
+        app:piv_strokeWidth="5dp"
+        app:piv_unselectedColor="@android:color/darker_gray"
+        app:piv_viewPager="@id/viewPager" />
+
+    <TextView
+        android:id="@+id/btn_skip"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Skip"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_marginLeft="260dp"
+        android:layout_marginTop="30dp" />
+
+</RelativeLayout>
