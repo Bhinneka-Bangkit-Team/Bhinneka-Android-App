@@ -11,13 +11,13 @@
         android:id="@+id/text1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:layout_marginRight="300dp"
+        android:layout_marginTop="88dp"
         android:text="Login"
         android:textColor="@color/blue"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.125"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="135dp"
         android:gravity="center"
-        android:textSize="18sp"
+        android:textSize="15sp"
         android:text="Selamat datang dan silahkan login ke akun kamu"
         android:textColor="@color/blue"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,7 +36,9 @@
 
     <EditText
         android:id="@+id/et_email"
-        android:layout_width="340dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="200dp"
         android:background="@drawable/rectangle_border_blue"
@@ -58,7 +60,9 @@
 
     <EditText
         android:id="@+id/et_password"
-        android:layout_width="340dp"
+        android:layout_width="match_parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_height="40dp"
         android:layout_marginTop="280dp"
         android:background="@drawable/rectangle_border_blue"
