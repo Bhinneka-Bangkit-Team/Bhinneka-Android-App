@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.capstone.komunitas">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,9 +10,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Komunitas">
-        <activity android:name=".MainActivity"></activity>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".DaftarActivity" />
+        <activity android:name=".ui.home.HomeActivity" />
+        <activity android:name=".ui.auth.LoginActivity" />
+        <activity android:name=".ui.auth.DaftarActivity" />
         <activity android:name=".OnboardingActivity" />
         <activity
             android:name=".SplashscreenActivity"
