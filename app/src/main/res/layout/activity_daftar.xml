@@ -198,9 +198,11 @@
 
                 <TextView
                     android:id="@+id/tv_login"
+                    android:layout_marginLeft="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Login"
+                    android:onClick="@{viewmodel::onShowLogin}"
                     android:textColor="@color/blue"
                     android:textStyle="bold"/>
 

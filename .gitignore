@@ -14,12 +14,4 @@
 .cxx
 local.properties
 .idea/.name
-app/src/main/java/com/capstone/komunitas/data/network/BackendApi.kt
-app/src/main/java/com/capstone/komunitas/data/repositories/
-app/src/main/java/com/capstone/komunitas/ui/auth/AuthListener.kt
-app/src/main/java/com/capstone/komunitas/ui/auth/AuthViewModel.kt
-app/src/main/java/com/capstone/komunitas/ui/auth/DaftarActivity.kt
-app/src/main/java/com/capstone/komunitas/ui/auth/LoginActivity.kt
-app/src/main/java/com/capstone/komunitas/util/ViewUtils.kt
-app/src/main/res/navigation/
 /.idea/
