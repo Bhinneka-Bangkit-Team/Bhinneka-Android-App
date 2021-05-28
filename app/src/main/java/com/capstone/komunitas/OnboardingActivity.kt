@@ -3,6 +3,7 @@ package com.capstone.komunitas
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.capstone.komunitas.ui.auth.DaftarActivity
 import kotlinx.android.synthetic.main.activity_onboarding.*
 
 class OnboardingActivity : AppCompatActivity() {

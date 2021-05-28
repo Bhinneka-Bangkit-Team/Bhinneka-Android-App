@@ -2,30 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.capstone.komunitas">
 
-    <uses-sdk />
-
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".BaseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Komunitas">
-        <activity
-            android:name=".views.camera_detection.DetectionObjectActivity">
-
-        </activity>
-        <activity android:name=".views.camera_detection.CameraActivity" android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".DaftarActivity" />
+        <activity android:name=".ui.chat.ChatNoVideoActivity"></activity>
+        <activity android:name=".ui.home.HomeActivity" />
+        <activity android:name=".ui.auth.LoginActivity" />
+        <activity android:name=".ui.auth.DaftarActivity" />
         <activity android:name=".OnboardingActivity" />
         <activity
             android:name=".SplashscreenActivity"
