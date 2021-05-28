@@ -17,9 +17,9 @@
         <activity android:name=".ui.home.HomeActivity" />
         <activity android:name=".ui.auth.LoginActivity" />
         <activity android:name=".ui.auth.DaftarActivity" />
-        <activity android:name=".OnboardingActivity" />
+        <activity android:name=".ui.onboarding.OnboardingActivity" />
         <activity
-            android:name=".SplashscreenActivity"
+            android:name=".ui.splash.SplashscreenActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

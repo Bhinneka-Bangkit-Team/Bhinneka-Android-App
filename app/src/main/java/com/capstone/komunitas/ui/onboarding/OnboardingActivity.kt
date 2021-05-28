@@ -1,8 +1,9 @@
-package com.capstone.komunitas
+package com.capstone.komunitas.ui.onboarding
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.capstone.komunitas.R
 import com.capstone.komunitas.ui.auth.DaftarActivity
 import kotlinx.android.synthetic.main.activity_onboarding.*
 

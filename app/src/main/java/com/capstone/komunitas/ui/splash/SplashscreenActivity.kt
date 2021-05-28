@@ -1,9 +1,11 @@
-package com.capstone.komunitas
+package com.capstone.komunitas.ui.splash
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import com.capstone.komunitas.ui.onboarding.OnboardingActivity
+import com.capstone.komunitas.R
 
 class SplashscreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
