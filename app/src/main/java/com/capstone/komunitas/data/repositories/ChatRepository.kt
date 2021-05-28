@@ -8,6 +8,7 @@ import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.data.db.entities.User
 import com.capstone.komunitas.data.network.BackendApi
 import com.capstone.komunitas.data.network.SafeApiRequest
+import com.capstone.komunitas.data.network.responses.AuthResponse
 import com.capstone.komunitas.data.network.responses.ChatResponse
 import com.capstone.komunitas.util.Coroutines
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 private val MINIMUM_INTERVAL = 6
+private val BEARER_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRldmVsb3BlckBnbWFpbC5jb20iLCJzdWIiOjEsImlhdCI6MTYyMjE5NDI2MCwiZXhwIjoxNjUzNzMwMjYwfQ.b7r77yqjxcPhreW354sW4Sv7537qzjxaBYzDML1eLZE"
 
 class ChatRepository(
     private val api: BackendApi,
@@ -42,7 +44,7 @@ class ChatRepository(
         val lastSavedAt = prefs.getLastSavedAt()
         if (lastSavedAt==null) {
             val response = apiRequest {
-                api.getChat("Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRldmVsb3BlckBnbWFpbC5jb20iLCJzdWIiOjEsImlhdCI6MTYyMjE5NDI2MCwiZXhwIjoxNjUzNzMwMjYwfQ.b7r77yqjxcPhreW354sW4Sv7537qzjxaBYzDML1eLZE")
+                api.getChat(BEARER_TOKEN)
             }
             // Check if chat data is not empty
             if(response.data != null){
@@ -50,7 +52,7 @@ class ChatRepository(
             }
         }else if(isFetchNeeded(LocalDateTime.parse(lastSavedAt))){
             val response = apiRequest {
-                api.getChat("Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRldmVsb3BlckBnbWFpbC5jb20iLCJzdWIiOjEsImlhdCI6MTYyMjE5NDI2MCwiZXhwIjoxNjUzNzMwMjYwfQ.b7r77yqjxcPhreW354sW4Sv7537qzjxaBYzDML1eLZE")
+                api.getChat(BEARER_TOKEN)
             }
             // Check if chat data is not empty
             if(response.data != null){
@@ -63,7 +65,13 @@ class ChatRepository(
         return ChronoUnit.HOURS.between(savedAt, LocalDateTime.now()) > MINIMUM_INTERVAL
     }
 
-    private fun saveChat(chats: List<Chat>) {
+    suspend fun sendChat(text: String, isSpeaker: Int): ChatResponse {
+        return apiRequest {
+            api.sendChat(BEARER_TOKEN, text, isSpeaker, "id-ID")
+        }
+    }
+
+    fun saveChat(chats: List<Chat>) {
         Coroutines.io {
             prefs.savelastSavedAt(LocalDateTime.now().toString())
             db.getChatDao().saveAllChat(chats)

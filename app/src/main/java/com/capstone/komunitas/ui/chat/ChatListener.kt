@@ -7,4 +7,7 @@ interface ChatListener {
     fun onGetStarted()
     fun onGetSuccess(chats: List<Chat>)
     fun onGetFailure(message: String)
+    fun onSendStarted()
+    fun onSendSuccess(message: String)
+    fun onSendFailure(message: String)
 }

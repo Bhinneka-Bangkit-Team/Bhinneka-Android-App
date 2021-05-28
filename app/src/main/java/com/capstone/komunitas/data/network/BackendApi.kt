@@ -37,6 +37,7 @@ interface BackendApi {
     suspend fun sendChat(
         @Header("Authorization") accessToken: String,
         @Field("text") text: String,
+        @Field("isSpeaker") isSpeaker: Int,
         @Field("lang") lang: String
     ): Response<ChatResponse>
 

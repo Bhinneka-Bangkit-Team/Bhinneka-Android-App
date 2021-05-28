@@ -10,7 +10,6 @@ import com.capstone.komunitas.R
 import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.databinding.ActivityChatNoVideoBinding
 import com.capstone.komunitas.util.*
-import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.android.synthetic.main.activity_chat_no_video.*
 import org.kodein.di.KodeinAware
@@ -40,25 +39,25 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         progress_bar_chat_novideo.show()
         viewModel.chats.await().observe(this, Observer {
             progress_bar_chat_novideo.hide()
-            initRecyclerView(it.toChatItem())
+            initRecyclerView(it)
         })
     }
 
-    private fun initRecyclerView(chatItem: List<ChatItem>) {
-        val groupAdapter = GroupieAdapter().apply {
-            addAll(chatItem)
+    private fun initRecyclerView(chatItem: List<Chat>) {
+        val groupAdapter = GroupieAdapter()
+
+        chatItem.forEach {
+            if (it.isSpeaker == 1) {
+                groupAdapter.add(ChatReceivedItem(it))
+            } else {
+                groupAdapter.add(ChatSentItem(it))
+            }
         }
 
         messagesRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
             adapter = groupAdapter
-        }
-    }
-
-    private fun List<Chat>.toChatItem(): List<ChatItem> {
-        return this.map {
-            ChatItem(it)
         }
     }
 
@@ -71,6 +70,18 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     }
 
     override fun onGetFailure(message: String) {
-        toast("Failed")
+        toast(message)
+    }
+
+    override fun onSendStarted() {
+        toast("Started")
+    }
+
+    override fun onSendSuccess(message: String) {
+        toast(message)
+    }
+
+    override fun onSendFailure(message: String) {
+        toast(message)
     }
 }

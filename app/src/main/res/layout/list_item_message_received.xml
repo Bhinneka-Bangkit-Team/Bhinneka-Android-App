@@ -13,7 +13,6 @@
         <variable
             name="message"
             type="com.capstone.komunitas.data.db.entities.Chat" />
-
     </data>
 
     <LinearLayout

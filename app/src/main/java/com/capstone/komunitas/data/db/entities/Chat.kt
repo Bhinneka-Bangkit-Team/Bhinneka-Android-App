@@ -9,6 +9,7 @@ data class Chat(
     @PrimaryKey(autoGenerate = false)
     var id: Int? = null,
     var userId: String? = null,
+    var isSpeaker: Int? = null,
     var text: String? = null,
     var lang: String? = null
 )
