@@ -146,7 +146,6 @@
                     android:onClick="@{viewmodel::onShowRegister}"
                     android:textColor="@color/blue"
                     android:textStyle="bold"/>
-
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
