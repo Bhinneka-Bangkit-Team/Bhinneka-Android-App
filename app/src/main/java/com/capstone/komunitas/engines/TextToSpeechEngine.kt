@@ -10,10 +10,6 @@ class TextToSpeechEngine (
 ) {
     private val appContext = context.applicationContext
 
-    companion object {
-        private const val REQUEST_CODE_STT = 1
-    }
-
     private val textToSpeechEngine: TextToSpeech by lazy {
         TextToSpeech(appContext,
             TextToSpeech.OnInitListener { status ->

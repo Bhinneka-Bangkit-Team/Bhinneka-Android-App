@@ -44,6 +44,7 @@ class ChatViewModel(
                         textToSpeechEngine.textToSpeech(newMessageText!!)
                         repository.saveChat(it.data)
                         chatListener?.onSendSuccess("Berhasil mengambil pesan")
+                        newMessageText = null
                         return@main
                     }
                 }
