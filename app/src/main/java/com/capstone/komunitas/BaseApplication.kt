@@ -26,7 +26,7 @@ class BaseApplication: Application(), KodeinAware {
         bind() from this.singleton { BackendApi(this.instance()) }
         bind() from this.singleton { AppDatabase(this.instance()) }
         bind() from this.singleton { PreferenceProvider(this.instance()) }
-        bind() from this.singleton { UserRepository(this.instance(), this.instance()) }
+        bind() from this.singleton { UserRepository(this.instance(), this.instance(), this.instance()) }
         bind() from this.singleton { ChatRepository(this.instance(), this.instance(), this.instance()) }
         bind() from this.provider { AuthViewModelFactory(this.instance()) }
         bind() from this.provider { HomeViewModelFactory(this.instance()) }
