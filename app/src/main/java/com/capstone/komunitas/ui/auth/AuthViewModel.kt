@@ -41,6 +41,7 @@ class AuthViewModel(
                 val authResponse = repository.userRegister(email!!, password!!, firstName!!, lastName!!)
                 authResponse.data?.let {
                     if (it.firstName != null) {
+                        repository.saveAuthToken(authResponse.accessToken!!)
                         repository.saveUser(it)
                         authListener?.onSuccess(it)
                         return@main
@@ -79,6 +80,7 @@ class AuthViewModel(
                 val authResponse = repository.userLogin(email!!, password!!)
                 authResponse.data?.let {
                     if (it.firstName != null) {
+                        repository.saveAuthToken(authResponse.accessToken!!)
                         repository.saveUser(it)
                         authListener?.onSuccess(it)
                         return@main

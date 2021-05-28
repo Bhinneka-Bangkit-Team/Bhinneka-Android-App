@@ -1,23 +1,30 @@
 package com.capstone.komunitas.ui.chat
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.data.repositories.ChatRepository
-import com.capstone.komunitas.ui.home.HomeListener
+import com.capstone.komunitas.engines.TextToSpeechEngine
 import com.capstone.komunitas.util.ApiException
 import com.capstone.komunitas.util.Coroutines
 import com.capstone.komunitas.util.NoInternetException
-import com.capstone.komunitas.util.lazyDeferred
+import kotlinx.coroutines.*
 
 class ChatViewModel(
-    private val repository: ChatRepository
+    private val repository: ChatRepository,
+    private val textToSpeechEngine: TextToSpeechEngine
 ) : ViewModel() {
     var chatListener: ChatListener? = null
     var newMessageText: String? = null
 
     val chats by lazyDeferred {
         repository.getChat()
+    }
+
+    fun<T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>>{
+        return lazy {
+            GlobalScope.async(start = CoroutineStart.LAZY) {
+                block.invoke(this)
+            }
+        }
     }
 
     fun sendMessagePressed() {
@@ -34,12 +41,14 @@ class ChatViewModel(
                 val chatResponse = repository.sendChat(newMessageText!!, 0)
                 chatResponse?.let {
                     if (it.data!!.size > 0) {
+                        textToSpeechEngine.textToSpeech(newMessageText!!)
                         repository.saveChat(it.data)
                         chatListener?.onSendSuccess("Berhasil mengambil pesan")
+                        newMessageText = null
                         return@main
                     }
                 }
-                chatListener?.onSendFailure(chatResponse.message!!)
+                chatListener?.onSendFailure("Terjadi kesalahan")
             } catch (e: ApiException) {
                 chatListener?.onSendFailure(e.message!!)
             } catch (e: NoInternetException) {

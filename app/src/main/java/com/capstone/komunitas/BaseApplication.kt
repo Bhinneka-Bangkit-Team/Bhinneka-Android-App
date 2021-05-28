@@ -7,6 +7,7 @@ import com.capstone.komunitas.data.network.BackendApi
 import com.capstone.komunitas.data.network.NetworkConnectionInterceptor
 import com.capstone.komunitas.data.repositories.ChatRepository
 import com.capstone.komunitas.data.repositories.UserRepository
+import com.capstone.komunitas.engines.TextToSpeechEngine
 import com.capstone.komunitas.ui.auth.AuthViewModelFactory
 import com.capstone.komunitas.ui.chat.ChatViewModelFactory
 import com.capstone.komunitas.ui.home.HomeViewModelFactory
@@ -26,11 +27,12 @@ class BaseApplication: Application(), KodeinAware {
         bind() from this.singleton { BackendApi(this.instance()) }
         bind() from this.singleton { AppDatabase(this.instance()) }
         bind() from this.singleton { PreferenceProvider(this.instance()) }
-        bind() from this.singleton { UserRepository(this.instance(), this.instance()) }
+        bind() from this.singleton { TextToSpeechEngine(this.instance()) }
+        bind() from this.singleton { UserRepository(this.instance(), this.instance(), this.instance()) }
         bind() from this.singleton { ChatRepository(this.instance(), this.instance(), this.instance()) }
         bind() from this.provider { AuthViewModelFactory(this.instance()) }
         bind() from this.provider { HomeViewModelFactory(this.instance()) }
-        bind() from this.provider { ChatViewModelFactory(this.instance()) }
+        bind() from this.provider { ChatViewModelFactory(this.instance(), this.instance()) }
 
     }
 }

@@ -5,20 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import com.capstone.komunitas.data.db.AppDatabase
 import com.capstone.komunitas.data.db.PreferenceProvider
 import com.capstone.komunitas.data.db.entities.Chat
-import com.capstone.komunitas.data.db.entities.User
 import com.capstone.komunitas.data.network.BackendApi
 import com.capstone.komunitas.data.network.SafeApiRequest
-import com.capstone.komunitas.data.network.responses.AuthResponse
 import com.capstone.komunitas.data.network.responses.ChatResponse
 import com.capstone.komunitas.util.Coroutines
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.Response
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 private val MINIMUM_INTERVAL = 6
-private val BEARER_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRldmVsb3BlckBnbWFpbC5jb20iLCJzdWIiOjEsImlhdCI6MTYyMjE5NDI2MCwiZXhwIjoxNjUzNzMwMjYwfQ.b7r77yqjxcPhreW354sW4Sv7537qzjxaBYzDML1eLZE"
 
 class ChatRepository(
     private val api: BackendApi,
@@ -42,9 +38,10 @@ class ChatRepository(
 
     private suspend fun fetchChats() {
         val lastSavedAt = prefs.getLastSavedAt()
+        val token = "Bearer "+prefs.getAuthToken() ?: return
         if (lastSavedAt==null) {
             val response = apiRequest {
-                api.getChat(BEARER_TOKEN)
+                api.getChat(token!!)
             }
             // Check if chat data is not empty
             if(response.data != null){
@@ -52,7 +49,7 @@ class ChatRepository(
             }
         }else if(isFetchNeeded(LocalDateTime.parse(lastSavedAt))){
             val response = apiRequest {
-                api.getChat(BEARER_TOKEN)
+                api.getChat(token!!)
             }
             // Check if chat data is not empty
             if(response.data != null){
@@ -65,9 +62,10 @@ class ChatRepository(
         return ChronoUnit.HOURS.between(savedAt, LocalDateTime.now()) > MINIMUM_INTERVAL
     }
 
-    suspend fun sendChat(text: String, isSpeaker: Int): ChatResponse {
+    suspend fun sendChat(text: String, isSpeaker: Int): ChatResponse? {
+        val token = "Bearer "+prefs.getAuthToken() ?: return null
         return apiRequest {
-            api.sendChat(BEARER_TOKEN, text, isSpeaker, "id-ID")
+            api.sendChat(token!!, text, isSpeaker, "id-ID")
         }
     }
 
