@@ -24,11 +24,10 @@
 
             <TextView
                 android:id="@+id/text1"
-                android:layout_width="wrap_content"
+                android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="100dp"
-                android:layout_marginRight="300dp"
-                android:text="Login"
+                android:text="Selamat Datang"
                 android:textColor="@color/blue"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -38,11 +37,11 @@
 
             <TextView
                 android:id="@+id/text2"
-                android:layout_width="wrap_content"
+                android:layout_width="350dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="135dp"
-                android:gravity="center"
-                android:text="Selamat datang dan silahkan login ke akun kamu"
+                android:layout_marginTop="132dp"
+                android:gravity="left"
+                android:text="Silahkan login ke akun kamu"
                 android:textColor="@color/blue"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -51,49 +50,47 @@
 
             <EditText
                 android:id="@+id/et_email"
-                android:layout_width="340dp"
+                android:layout_width="350dp"
                 android:layout_height="40dp"
-                android:layout_marginTop="200dp"
+                android:layout_marginTop="40dp"
                 android:background="@drawable/rectangle_border_blue"
                 android:hint="  Email"
                 android:text="@={viewmodel.email}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/text2" />
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="260dp"
-                android:layout_marginBottom="293dp"
+                android:layout_marginTop="45dp"
+                android:layout_marginLeft="280dp"
                 android:src="@drawable/ic_email"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/text2" />
 
             <EditText
                 android:id="@+id/et_password"
-                android:layout_width="340dp"
+                android:layout_width="350dp"
                 android:layout_height="40dp"
-                android:layout_marginTop="280dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/rectangle_border_blue"
                 android:hint="  Kata Sandi"
                 android:text="@={viewmodel.password}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/et_email"/>
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="260dp"
-                android:layout_marginBottom="132dp"
+                android:layout_marginLeft="280dp"
+                android:layout_marginTop="15dp"
                 android:src="@drawable/ic_lock"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/et_email"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -109,38 +106,46 @@
 
             <Button
                 android:id="@+id/btn_login2"
-                android:layout_width="340dp"
+                android:layout_width="350dp"
                 android:layout_height="40dp"
-                android:layout_marginTop="400dp"
+                android:layout_marginTop="50dp"
                 android:background="@drawable/shape_rectangle_blue"
                 android:onClick="@{viewmodel::onLoginButtonClick}"
                 android:text="Login"
                 android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/et_password" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="470dp"
-                android:layout_marginRight="155dp"
-                android:text="Belum punya akun?"
-                android:textColor="@color/black"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/btn_login2"
+                app:layout_constraintStart_toStartOf="parent"
+                android:gravity="center_horizontal">
 
-            <TextView
-                android:id="@+id/btn_daftar2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="470dp"
-                android:layout_marginRight="121dp"
-                android:text="Daftar"
-                android:textColor="@color/blue"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/tv_sudahpunya"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Belum punya akun?"
+                    android:textColor="@color/black"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_daftar1"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_login"/>
+
+                <TextView
+                    android:id="@+id/btn_daftar2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Daftar"
+                    android:textColor="@color/blue"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ProgressBar
