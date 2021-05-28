@@ -38,7 +38,7 @@ class ChatRepository(
 
     private suspend fun fetchChats() {
         val lastSavedAt = prefs.getLastSavedAt()
-        val token = prefs.getAuthToken() ?: return
+        val token = "Bearer "+prefs.getAuthToken() ?: return
         if (lastSavedAt==null) {
             val response = apiRequest {
                 api.getChat(token!!)
@@ -63,7 +63,7 @@ class ChatRepository(
     }
 
     suspend fun sendChat(text: String, isSpeaker: Int): ChatResponse? {
-        val token = prefs.getAuthToken() ?: return null
+        val token = "Bearer "+prefs.getAuthToken() ?: return null
         return apiRequest {
             api.sendChat(token!!, text, isSpeaker, "id-ID")
         }

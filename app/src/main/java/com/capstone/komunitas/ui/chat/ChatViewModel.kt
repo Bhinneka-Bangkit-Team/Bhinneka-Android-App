@@ -2,13 +2,15 @@ package com.capstone.komunitas.ui.chat
 
 import androidx.lifecycle.ViewModel
 import com.capstone.komunitas.data.repositories.ChatRepository
+import com.capstone.komunitas.engines.TextToSpeechEngine
 import com.capstone.komunitas.util.ApiException
 import com.capstone.komunitas.util.Coroutines
 import com.capstone.komunitas.util.NoInternetException
 import kotlinx.coroutines.*
 
 class ChatViewModel(
-    private val repository: ChatRepository
+    private val repository: ChatRepository,
+    private val textToSpeechEngine: TextToSpeechEngine
 ) : ViewModel() {
     var chatListener: ChatListener? = null
     var newMessageText: String? = null
@@ -39,12 +41,13 @@ class ChatViewModel(
                 val chatResponse = repository.sendChat(newMessageText!!, 0)
                 chatResponse?.let {
                     if (it.data!!.size > 0) {
+                        textToSpeechEngine.textToSpeech(newMessageText!!)
                         repository.saveChat(it.data)
                         chatListener?.onSendSuccess("Berhasil mengambil pesan")
                         return@main
                     }
                 }
-                chatListener?.onSendFailure(chatResponse?.message!!)
+                chatListener?.onSendFailure("Terjadi kesalahan")
             } catch (e: ApiException) {
                 chatListener?.onSendFailure(e.message!!)
             } catch (e: NoInternetException) {
