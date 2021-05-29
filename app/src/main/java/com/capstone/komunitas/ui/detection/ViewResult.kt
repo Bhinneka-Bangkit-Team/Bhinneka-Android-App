@@ -1,4 +1,4 @@
-package com.capstone.komunitas.views
+package com.capstone.komunitas.ui.detection
 
 import com.capstone.komunitas.tflite.Classifier
 

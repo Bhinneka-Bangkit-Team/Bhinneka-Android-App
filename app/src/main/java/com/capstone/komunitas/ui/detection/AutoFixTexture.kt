@@ -1,4 +1,4 @@
-package com.capstone.komunitas.views
+package com.capstone.komunitas.ui.detection
 
 import android.content.Context
 import android.util.AttributeSet

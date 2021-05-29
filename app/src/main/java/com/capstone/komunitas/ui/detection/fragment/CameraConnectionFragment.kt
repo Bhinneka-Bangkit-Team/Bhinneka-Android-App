@@ -1,4 +1,4 @@
-package com.capstone.komunitas.views.fragment
+package com.capstone.komunitas.ui.detection.fragment
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -19,7 +19,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Toast
 import com.capstone.komunitas.R
-import com.capstone.komunitas.views.AutoFixTexture
+import com.capstone.komunitas.ui.detection.AutoFixTexture
 import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit

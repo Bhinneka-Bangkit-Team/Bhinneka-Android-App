@@ -7,7 +7,7 @@ import android.util.Log
 import android.util.Pair
 import android.util.TypedValue
 import com.capstone.komunitas.tflite.Classifier
-import com.capstone.komunitas.utils.Utils
+import com.capstone.komunitas.util.Utils
 import java.util.*
 
 class MultiBoxTracker(context: Context) {

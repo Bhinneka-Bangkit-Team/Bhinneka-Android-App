@@ -1,4 +1,4 @@
-package com.capstone.komunitas.views
+package com.capstone.komunitas.ui.detection
 
 import android.content.Context
 import android.graphics.Canvas
@@ -9,7 +9,7 @@ import android.util.TypedValue
 import android.view.View
 import com.capstone.komunitas.tflite.Classifier
 
-class RecognitionScoreView(attr: AttributeSet, context: Context): View(context,attr),ViewResult {
+class RecognitionScoreView(attr: AttributeSet, context: Context): View(context,attr), ViewResult {
 
     private val textSize: Float
     private val fg: Paint

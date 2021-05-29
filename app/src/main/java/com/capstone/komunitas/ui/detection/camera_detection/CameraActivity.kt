@@ -1,4 +1,4 @@
-package com.capstone.komunitas.views.camera_detection
+package com.capstone.komunitas.ui.detection.camera_detection
 
 import android.Manifest
 import android.content.Context
@@ -22,9 +22,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.capstone.komunitas.R
 import com.capstone.komunitas.databinding.ActivityCameraBinding
-import com.capstone.komunitas.utils.Utils
-import com.capstone.komunitas.views.fragment.CameraConnectionFragment
-import com.capstone.komunitas.views.fragment.LegacyCameraFragment
+import com.capstone.komunitas.util.Utils
+import com.capstone.komunitas.ui.detection.fragment.CameraConnectionFragment
+import com.capstone.komunitas.ui.detection.fragment.LegacyCameraFragment
 
 abstract class CameraActivity : AppCompatActivity(), ImageReader.OnImageAvailableListener, Camera.PreviewCallback, CompoundButton.OnCheckedChangeListener, View.OnClickListener, CameraConnectionFragment.ConnectionCallback {
 
@@ -68,7 +68,9 @@ abstract class CameraActivity : AppCompatActivity(), ImageReader.OnImageAvailabl
         textDetection = findViewById(R.id.detectionText)
         var isRequestPermission = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            isRequestPermission = checkSelfPermission(PERMISSION_CAMERA) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(PERMISSION_STORAGE) == PackageManager.PERMISSION_GRANTED
+            isRequestPermission = checkSelfPermission(PERMISSION_CAMERA) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(
+                PERMISSION_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
 
         } else {
             isRequestPermission = true
@@ -152,7 +154,7 @@ abstract class CameraActivity : AppCompatActivity(), ImageReader.OnImageAvailabl
         val fragment: Fragment
         if (useCamera2API){
             val camera2Fragment = CameraConnectionFragment.newInstance(
-                object:CameraConnectionFragment.ConnectionCallback{
+                object: CameraConnectionFragment.ConnectionCallback{
                     override fun onPreviewSizeChosen(size: Size, cameraRotation: Int) {
                         preHeight = size.height
                         preWidth = size.width

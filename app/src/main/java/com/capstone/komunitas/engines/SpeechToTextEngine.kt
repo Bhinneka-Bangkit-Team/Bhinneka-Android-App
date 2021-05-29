@@ -16,8 +16,12 @@ class SpeechToTextEngine(
 ) {
     private val appContext = context.applicationContext
 
-    private fun startSpeechToText():String? {
-        var textResult: String? = null
+     suspend fun startSpeechToText():String? {
+        var textResult: String? = ""
+
+         if(!isAudioPermissionGranted()){
+             return textResult
+         }
 
         val speechRecognizer = SpeechRecognizer.createSpeechRecognizer(appContext)
         val speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)

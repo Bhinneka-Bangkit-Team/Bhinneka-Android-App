@@ -1,4 +1,4 @@
-package com.capstone.komunitas.views.fragment
+package com.capstone.komunitas.ui.detection.fragment
 
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
@@ -10,8 +10,8 @@ import android.util.SparseIntArray
 import android.view.*
 import androidx.fragment.app.Fragment
 import com.capstone.komunitas.R
-import com.capstone.komunitas.utils.Utils
-import com.capstone.komunitas.views.AutoFixTexture
+import com.capstone.komunitas.util.Utils
+import com.capstone.komunitas.ui.detection.AutoFixTexture
 import java.io.IOException
 
 // TODO: Rename parameter arguments, choose names that match
@@ -52,7 +52,8 @@ class LegacyCameraFragment(private val imageListener: Camera.PreviewCallback, pr
                     sizes[i++] = Size(size.width, size.height)
                 }
                 val previewSize = CameraConnectionFragment.chooseOptimalSize(
-                    sizes, desiredSize.width, desiredSize.height)
+                    sizes, desiredSize.width, desiredSize.height
+                )
                 previewSize?.width?.let { parameters.setPreviewSize(it, previewSize.height) }
                 camera?.setDisplayOrientation(90)
                 camera?.parameters = parameters

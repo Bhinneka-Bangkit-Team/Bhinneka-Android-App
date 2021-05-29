@@ -1,4 +1,4 @@
-package com.capstone.komunitas.utils
+package com.capstone.komunitas.util
 
 import android.graphics.Bitmap
 import android.graphics.Matrix

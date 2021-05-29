@@ -1,9 +1,7 @@
-package com.capstone.komunitas.views.camera_detection
+package com.capstone.komunitas.ui.detection.camera_detection
 
 import android.graphics.*
 import android.media.ImageReader
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import android.util.Size
@@ -15,8 +13,8 @@ import com.capstone.komunitas.tflite.Classifier
 import com.capstone.komunitas.tflite.TFLiteModel
 import com.capstone.komunitas.tracking.BorderedText
 import com.capstone.komunitas.tracking.MultiBoxTracker
-import com.capstone.komunitas.utils.Utils
-import com.capstone.komunitas.views.OverlayView
+import com.capstone.komunitas.util.Utils
+import com.capstone.komunitas.ui.detection.OverlayView
 import java.io.IOException
 import java.util.*
 
@@ -46,7 +44,7 @@ class DetectionObjectActivity : CameraActivity(), ImageReader.OnImageAvailableLi
 
 
     override val desiredPreviewFrameSize: Size
-        get() =DESIRED_PREVIEW_SIZE
+        get() = DESIRED_PREVIEW_SIZE
 
     override val layoutId: Int
         get() = R.layout.fragment_camera_connection
@@ -59,7 +57,7 @@ class DetectionObjectActivity : CameraActivity(), ImageReader.OnImageAvailableLi
         borderedText?.setTypeface(Typeface.MONOSPACE)
 
         tracker = MultiBoxTracker(this)
-        var cropSize =TF_OD_API_INPUT_SIZE
+        var cropSize = TF_OD_API_INPUT_SIZE
         try {
             detector = TFLiteModel.create(
                 assets,
@@ -88,7 +86,7 @@ class DetectionObjectActivity : CameraActivity(), ImageReader.OnImageAvailableLi
         cropToFrameTransform = Matrix()
         frameToCropTransform?.invert(cropToFrameTransform)
         trackingOverlay = findViewById(R.id.tracking_overlay) as OverlayView
-        trackingOverlay.addCallback(object :OverlayView.DrawCallback{
+        trackingOverlay.addCallback(object : OverlayView.DrawCallback{
             override fun drawCallback(canvas: Canvas) {
                 tracker?.draw(canvas)
                 if (isDebug)

@@ -1,4 +1,4 @@
-package com.capstone.komunitas.views
+package com.capstone.komunitas.ui.detection
 
 import android.annotation.SuppressLint
 import android.content.Context
