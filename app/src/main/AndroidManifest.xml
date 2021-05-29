@@ -5,6 +5,15 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-sdk />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <application
         android:name=".BaseApplication"
         android:allowBackup="true"
@@ -13,6 +22,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Komunitas">
+        <activity
+            android:name=".views.camera_detection.DetectionObjectActivity">
+
+        </activity>
+        <activity android:name=".views.camera_detection.CameraActivity" android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".ui.chat.ChatNoVideoActivity"></activity>
         <activity android:name=".ui.home.HomeActivity" />
         <activity android:name=".ui.auth.LoginActivity" />
