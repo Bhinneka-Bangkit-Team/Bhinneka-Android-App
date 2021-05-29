@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Onboarding2Fragment">
+    tools:context=".ui.onboarding.Onboarding2Fragment">
 
     <ImageView
         android:id="@+id/img_top"

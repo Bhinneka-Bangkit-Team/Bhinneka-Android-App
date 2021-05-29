@@ -1,4 +1,4 @@
-package com.capstone.komunitas
+package com.capstone.komunitas.ui.onboarding
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
