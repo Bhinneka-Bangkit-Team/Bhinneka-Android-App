@@ -106,7 +106,7 @@ class TFLiteModel private constructor():Classifier{
     }
 
     override fun setUseNNAPI(isChecked: Boolean) {
-        if (tfLite != null) tfLite!!.setUseNNAPI(isChecked)
+        TODO("Not yet implemented")
     }
 
     companion object{

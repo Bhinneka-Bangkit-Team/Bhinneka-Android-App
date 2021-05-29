@@ -13,21 +13,20 @@
         android:id="@+id/root_layout_daftar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#E2E2E2"
+        android:background="@color/white"
         tools:context=".ui.auth.LoginActivity">
 
-        <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="400dp"
+            android:layout_gravity="center_horizontal"
             android:layout_height="match_parent"
-            android:background="@color/white"
             tools:context=".ui.auth.DaftarActivity">
 
             <TextView
                 android:id="@+id/text1"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="100dp"
                 android:text="Daftar Sekarang"
                 android:textColor="@color/blue"
@@ -39,21 +38,23 @@
 
             <TextView
                 android:id="@+id/text2"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="132dp"
+                android:layout_marginHorizontal="30dp"
                 android:gravity="left"
                 android:text="Mari bergabung bersama Selaras !"
                 android:textColor="@color/blue"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/text1" />
 
             <EditText
                 android:id="@+id/et_firstname"
-                android:layout_width="350dp"
+                android:paddingHorizontal="10dp"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="40dp"
                 android:background="@drawable/rectangle_border_blue"
                 android:text="@={viewmodel.firstName}"
@@ -67,16 +68,17 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginTop="45dp"
-                android:layout_marginLeft="280dp"
+                android:layout_marginRight="45dp"
                 android:src="@drawable/ic_person"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text2"  />
 
             <EditText
                 android:id="@+id/et_lastname"
-                android:layout_width="350dp"
+                android:paddingHorizontal="10dp"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/rectangle_border_blue"
                 android:text="@={viewmodel.lastName}"
@@ -90,17 +92,18 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="280dp"
+                android:layout_marginRight="45dp"
                 android:src="@drawable/ic_person"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/et_firstname"
                 app:layout_constraintBottom_toTopOf="@+id/et_email" />
 
             <EditText
                 android:id="@+id/et_email"
-                android:layout_width="350dp"
+                android:paddingHorizontal="10dp"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/rectangle_border_blue"
                 android:text="@={viewmodel.email}"
@@ -114,17 +117,18 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="280dp"
+                android:layout_marginRight="45dp"
                 android:src="@drawable/ic_email"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/et_lastname"
                 app:layout_constraintBottom_toTopOf="@+id/et_password"  />
 
             <EditText
                 android:id="@+id/et_password"
-                android:layout_width="350dp"
+                android:paddingHorizontal="10dp"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="10dp"
                 android:text="@={viewmodel.password}"
                 android:background="@drawable/rectangle_border_blue"
@@ -139,17 +143,18 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="280dp"
+                android:layout_marginRight="45dp"
                 android:src="@drawable/ic_lock"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/et_email"
                 app:layout_constraintBottom_toTopOf="@+id/et_password_confirm" />
 
             <EditText
                 android:id="@+id/et_password_confirm"
-                android:layout_width="350dp"
+                android:paddingHorizontal="10dp"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="10dp"
                 android:text="@={viewmodel.passwordConfirm}"
                 android:background="@drawable/rectangle_border_blue"
@@ -163,17 +168,17 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="280dp"
+                android:layout_marginRight="45dp"
                 android:layout_marginTop="15dp"
                 android:src="@drawable/ic_lock"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/et_password"/>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_daftar1"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="50dp"
                 android:onClick="@{viewmodel::onRegisterButtonClick}"
                 android:background="@drawable/shape_rectangle_blue"

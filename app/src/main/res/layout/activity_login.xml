@@ -13,13 +13,13 @@
         android:id="@+id/root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#E2E2E2"
+        android:background="@color/white"
         tools:context=".ui.auth.LoginActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+            android:layout_width="400dp"
+            android:layout_gravity="center_horizontal"
             android:layout_height="match_parent"
-            android:background="@color/white"
             tools:context=".ui.auth.LoginActivity">
 
             <TextView
@@ -39,17 +39,17 @@
                 android:id="@+id/text2"
                 android:layout_width="350dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="132dp"
                 android:gravity="left"
                 android:text="Silahkan login ke akun kamu"
                 android:textColor="@color/blue"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/text1" />
 
             <EditText
                 android:id="@+id/et_email"
+                android:paddingHorizontal="10dp"
                 android:layout_width="350dp"
                 android:layout_height="40dp"
                 android:layout_marginTop="40dp"
@@ -65,14 +65,14 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginTop="45dp"
-                android:layout_marginLeft="280dp"
+                android:layout_marginRight="45dp"
                 android:src="@drawable/ic_email"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text2" />
 
             <EditText
                 android:id="@+id/et_password"
+                android:paddingHorizontal="10dp"
                 android:layout_width="350dp"
                 android:layout_height="40dp"
                 android:layout_marginTop="10dp"
@@ -88,37 +88,38 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="280dp"
+                android:layout_marginRight="45dp"
                 android:layout_marginTop="15dp"
                 android:src="@drawable/ic_lock"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/et_email"/>
 
             <TextView
+                android:id="@+id/tv_lupapass"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:layout_marginLeft="220dp"
                 android:text="Lupa Kata Sandi?"
                 android:textColor="@color/blue"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/et_password" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_login2"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_marginTop="50dp"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginTop="40dp"
                 android:background="@drawable/shape_rectangle_blue"
                 android:onClick="@{viewmodel::onLoginButtonClick}"
                 android:text="Login"
                 android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/et_password" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_lupapass" />
 
             <LinearLayout
                 android:layout_marginTop="10dp"

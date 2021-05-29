@@ -1,53 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".ui.onboarding.Onboarding1Fragment">
 
     <ImageView
-        android:id="@+id/img_top"
+        android:id="@+id/img_bottom"
         android:layout_width="wrap_content"
-        android:layout_height="230dp"
-        android:src="@drawable/image_top_1"
-        android:layout_marginBottom="500dp"/>
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="150dp"
+        android:adjustViewBounds="true"
+        android:paddingHorizontal="50dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/onboarding_1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="45dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:layout_width="360dp"
-            android:layout_height="400dp"
-            android:layout_marginTop="100dp"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/onboarding_1" />
-
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_margin="45dp"
-            android:orientation="vertical" >
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="Deteksi Bahasa Isyarat"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Deteksi Bahasa Isyarat"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_marginBottom="10dp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/black"
-                android:text="Visualisasikan isyarat kemudian dikonversi menjadi text untuk dibaca oleh lawan bicaramu"
-                android:textSize="18sp"
-                android:layout_marginBottom="100dp"/>
-        </LinearLayout>
-    </RelativeLayout>
-</FrameLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="100dp"
+            android:gravity="center"
+            android:text="Visualisasikan isyarat kemudian dikonversi menjadi text untuk dibaca oleh lawan bicaramu"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

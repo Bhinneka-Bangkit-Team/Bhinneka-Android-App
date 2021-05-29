@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.capstone.komunitas.R
 import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.databinding.ActivityChatNoVideoBinding
+import com.capstone.komunitas.databinding.ActivityChatWithVideoBinding
 import com.capstone.komunitas.util.*
 import com.google.common.util.concurrent.ListenableFuture
 import com.xwray.groupie.GroupieAdapter
@@ -43,7 +44,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         }, ContextCompat.getMainExecutor(this))
 
         // ViewModel binding
-        val binding: ActivityChatNoVideoBinding =
+        val binding: ActivityChatWithVideoBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_chat_with_video)
         val viewModel = ViewModelProviders.of(this, factory).get(ChatViewModel::class.java)
         binding.viewmodel = viewModel
