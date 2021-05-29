@@ -1,23 +1,17 @@
 package com.capstone.komunitas.ui.splash
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.capstone.komunitas.ui.onboarding.OnboardingActivity
 import com.capstone.komunitas.R
-import com.capstone.komunitas.databinding.ActivityDaftarBinding
 import com.capstone.komunitas.databinding.ActivitySplashscreenBinding
-import com.capstone.komunitas.ui.auth.AuthListener
-import com.capstone.komunitas.ui.auth.AuthViewModel
-import com.capstone.komunitas.ui.auth.AuthViewModelFactory
 import com.capstone.komunitas.ui.home.HomeActivity
+import com.capstone.komunitas.ui.onboarding.OnboardingActivity
 import com.capstone.komunitas.util.hide
 import com.capstone.komunitas.util.show
-import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_splashscreen.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
