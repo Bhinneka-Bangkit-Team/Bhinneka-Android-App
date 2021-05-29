@@ -59,7 +59,6 @@ abstract class CameraActivity : AppCompatActivity(), ImageReader.OnImageAvailabl
 
     protected abstract val layoutId: Int
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)

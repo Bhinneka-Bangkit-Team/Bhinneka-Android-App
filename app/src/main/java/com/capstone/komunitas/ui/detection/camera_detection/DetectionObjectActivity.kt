@@ -19,9 +19,6 @@ import java.io.IOException
 import java.util.*
 
 class DetectionObjectActivity : CameraActivity(), ImageReader.OnImageAvailableListener {
-
-
-
     internal lateinit var trackingOverlay: OverlayView
     private var sensorOrientation: Int? = null
 

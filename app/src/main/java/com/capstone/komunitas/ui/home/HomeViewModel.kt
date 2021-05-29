@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.capstone.komunitas.data.repositories.UserRepository
 import com.capstone.komunitas.ui.auth.LoginActivity
 import com.capstone.komunitas.ui.chat.ChatNoVideoActivity
+import com.capstone.komunitas.ui.chat.ChatWithVideoActivity
 import com.capstone.komunitas.util.ApiException
 import com.capstone.komunitas.util.Coroutines
 
@@ -16,6 +17,12 @@ class HomeViewModel(
 
     fun onShowChatNoVideo(view: View){
         Intent(view.context, ChatNoVideoActivity::class.java).also{
+            view.context.startActivity(it)
+        }
+    }
+
+    fun onShowChatWithVideo(view: View){
+        Intent(view.context, ChatWithVideoActivity::class.java).also{
             view.context.startActivity(it)
         }
     }
