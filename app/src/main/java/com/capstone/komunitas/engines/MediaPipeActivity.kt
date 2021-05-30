@@ -72,6 +72,7 @@ class MediaPipeActivity() : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(contentViewLayoutResId)
+
         previewDisplayView = SurfaceView(this)
         setupPreviewDisplayView()
 
