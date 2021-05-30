@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="12dp"
+            android:lineHeight="25dp"
             android:background="@drawable/rounded_rectangle_primary"
             android:maxWidth="240dp"
             android:paddingLeft="12dp"
@@ -36,8 +37,8 @@
             android:paddingRight="12dp"
             android:paddingBottom="6dp"
             android:text="@{message.text}"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            tools:text="This is a message" />
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            tools:text="This is a message This is a message This is a message This is a message This is a message This is a message This is a message This is a message " />
     </LinearLayout>
 </layout>

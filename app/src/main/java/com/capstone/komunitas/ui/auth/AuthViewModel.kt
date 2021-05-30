@@ -35,6 +35,11 @@ class AuthViewModel(
             return
         }
 
+        if(password != passwordConfirm){
+            authListener?.onFailure("Password konfirmasi harus sama dengan password anda !")
+            return
+        }
+
         // Call api via kotlin coroutines
         Coroutines.main {
             try {

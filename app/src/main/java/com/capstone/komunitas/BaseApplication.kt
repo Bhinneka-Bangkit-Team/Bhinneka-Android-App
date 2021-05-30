@@ -11,6 +11,7 @@ import com.capstone.komunitas.engines.TextToSpeechEngine
 import com.capstone.komunitas.ui.auth.AuthViewModelFactory
 import com.capstone.komunitas.ui.chat.ChatViewModelFactory
 import com.capstone.komunitas.ui.home.HomeViewModelFactory
+import com.capstone.komunitas.ui.splash.SplashScreenViewModelFactory
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.androidXModule
@@ -30,6 +31,7 @@ class BaseApplication: Application(), KodeinAware {
         bind() from this.singleton { TextToSpeechEngine(this.instance()) }
         bind() from this.singleton { UserRepository(this.instance(), this.instance(), this.instance()) }
         bind() from this.singleton { ChatRepository(this.instance(), this.instance(), this.instance()) }
+        bind() from this.provider { SplashScreenViewModelFactory(this.instance()) }
         bind() from this.provider { AuthViewModelFactory(this.instance()) }
         bind() from this.provider { HomeViewModelFactory(this.instance()) }
         bind() from this.provider { ChatViewModelFactory(this.instance(), this.instance()) }

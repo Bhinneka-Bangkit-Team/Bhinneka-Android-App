@@ -1,7 +1,6 @@
 package com.capstone.komunitas.ui.chat
 
 import com.capstone.komunitas.data.db.entities.Chat
-import com.capstone.komunitas.data.db.entities.User
 
 interface ChatListener {
     fun onGetStarted()
@@ -10,4 +9,7 @@ interface ChatListener {
     fun onSendStarted()
     fun onSendSuccess(message: String)
     fun onSendFailure(message: String)
+    fun onBack()
+    fun onChangeLens(lensFacing: Int)
+    fun onRecordPressed(isRecording: Boolean)
 }

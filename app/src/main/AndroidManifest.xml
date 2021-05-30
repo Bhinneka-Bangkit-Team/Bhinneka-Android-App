@@ -8,7 +8,6 @@
     <uses-sdk />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature android:name="android.hardware.camera" />
@@ -23,15 +22,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Komunitas">
         <activity
-            android:name=".views.camera_detection.DetectionObjectActivity">
+            android:name=".ui.detection.camera_detection.DetectionObjectActivity">
 
         </activity>
-        <activity android:name=".views.camera_detection.CameraActivity" android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity android:name=".ui.chat.ChatNoVideoActivity"></activity>
+        <activity android:name=".ui.detection.camera_detection.CameraActivity" android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity android:name=".ui.chat.ChatNoVideoActivity" />
+        <activity android:name=".ui.chat.ChatWithVideoActivity" />
         <activity android:name=".ui.home.HomeActivity" />
         <activity android:name=".ui.auth.LoginActivity" />
         <activity android:name=".ui.auth.DaftarActivity" />
         <activity android:name=".ui.onboarding.OnboardingActivity" />
+        <activity android:name=".engines.MediaPipeActivity" />
         <activity
             android:name=".ui.splash.SplashscreenActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
