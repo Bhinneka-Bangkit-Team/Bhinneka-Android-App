@@ -16,19 +16,13 @@ class ChatViewModel(
     var chatListener: ChatListener? = null
     var newMessageText: String? = null
     var isRecording: Boolean = false
-    var lensFacing = CameraSelector.LENS_FACING_BACK
 
     val chats by lazyDeferred {
         repository.getChat()
     }
 
     fun changeLens(){
-        lensFacing = if (CameraSelector.LENS_FACING_FRONT == lensFacing) {
-            CameraSelector.LENS_FACING_BACK
-        } else {
-            CameraSelector.LENS_FACING_FRONT
-        }
-        chatListener?.onChangeLens(lensFacing)
+        chatListener?.onChangeLens()
     }
 
     fun<T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>>{

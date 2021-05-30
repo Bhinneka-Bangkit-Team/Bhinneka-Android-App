@@ -10,6 +10,6 @@ interface ChatListener {
     fun onSendSuccess(message: String)
     fun onSendFailure(message: String)
     fun onBack()
-    fun onChangeLens(lensFacing: Int)
+    fun onChangeLens()
     fun onRecordPressed(isRecording: Boolean)
 }

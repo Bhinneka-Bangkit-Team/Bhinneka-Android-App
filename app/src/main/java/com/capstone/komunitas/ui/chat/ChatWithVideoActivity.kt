@@ -53,7 +53,6 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         private val OUTPUT_LANDMARKS_STREAM_NAME = "hand_landmarks"
         private val INPUT_NUM_HANDS_SIDE_PACKET_NAME = "num_hands"
         private val NUM_HANDS = 2
-        private val CAMERA_FACING: CameraHelper.CameraFacing = CameraHelper.CameraFacing.FRONT
         private val FLIP_FRAMES_VERTICALLY = true
 
         init {
@@ -62,6 +61,8 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         }
     }
 
+    private var lensFacing: CameraHelper.CameraFacing = CameraHelper.CameraFacing.FRONT
+    private var isSurfaceAttached: Boolean = false
     private var previewFrameTexture: SurfaceTexture? = null
     private var previewDisplayView: SurfaceView? = null
     private var eglManager: EglManager? = null
@@ -79,7 +80,6 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         binding.viewmodel = viewModel
 
         viewModel.chatListener = this
-        viewModel.lensFacing = CameraSelector.LENS_FACING_BACK
 
         bindUI(viewModel)
 //        bindCamera(viewModel.lensFacing)
@@ -130,6 +130,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
 
     override fun onResume() {
         super.onResume()
+        isSurfaceAttached = false
         converter = ExternalTextureConverter(
             eglManager?.getContext(), 2
         )
@@ -167,7 +168,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         cameraHelper = CameraXPreviewHelper()
         cameraHelper!!.setOnCameraStartedListener(
             { surfaceTexture -> onCameraStarted(surfaceTexture) })
-        val cameraFacing: CameraHelper.CameraFacing = CameraHelper.CameraFacing.FRONT
+        val cameraFacing: CameraHelper.CameraFacing = lensFacing
         cameraHelper!!.startCamera(
             this, cameraFacing,  /*unusedSurfaceTexture=*/null, cameraTargetResolution()
         )
@@ -184,6 +185,10 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         val displaySize: Size = cameraHelper!!.computeDisplaySizeFromViewSize(viewSize)
         val isCameraRotated: Boolean = cameraHelper!!.isCameraRotated()
 
+        if(isSurfaceAttached){
+            previewFrameTexture!!.detachFromGLContext()
+        }
+        isSurfaceAttached = true
         converter!!.setSurfaceTextureAndAttachToGLContext(
             previewFrameTexture,
             if (isCameraRotated) displaySize.height else displaySize.width,
@@ -350,8 +355,19 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         this.finish()
     }
 
-    override fun onChangeLens(lensFacing: Int) {
-//        bindCamera(lensFacing)
+    override fun onChangeLens() {
+        if (CameraHelper.CameraFacing.FRONT == lensFacing) {
+            lensFacing = CameraHelper.CameraFacing.BACK
+            restartCamera()
+        } else {
+            lensFacing = CameraHelper.CameraFacing.FRONT
+            restartCamera()
+        }
+    }
+
+    private fun restartCamera(){
+        onPause()
+        onResume()
     }
 
     override fun onRecordPressed(isRecording: Boolean) {

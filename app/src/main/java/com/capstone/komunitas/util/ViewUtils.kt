@@ -56,3 +56,26 @@ fun Activity.isKeyboardOpen(): Boolean {
     val marginOfError = Math.round(this.convertDpToPx(10F))
     return heightDiff > marginOfError
 }
+
+
+//    fun bindCamera(lensFacing: Int) {
+//        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+//        cameraProviderFuture.addListener(Runnable {
+//            val cameraProvider = cameraProviderFuture.get()
+//            cameraProvider.unbindAll()
+//            bindPreview(cameraProvider, lensFacing)
+//        }, ContextCompat.getMainExecutor(this))
+//    }
+//
+//    fun bindPreview(cameraProvider: ProcessCameraProvider, lensFacing: Int) {
+//        val preview: Preview = Preview.Builder()
+//            .build()
+//
+//        val cameraSelector: CameraSelector = CameraSelector.Builder()
+//            .requireLensFacing(lensFacing)
+//            .build()
+//
+//        preview.setSurfaceProvider(previewView.getSurfaceProvider())
+//
+//        var camera = cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, preview)
+//    }
