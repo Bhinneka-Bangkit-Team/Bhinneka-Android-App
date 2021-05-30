@@ -12,5 +12,6 @@
     <color name="purple_700">#8AA1DF</color>
     <color name="teal_200">#8AA1DF</color>
     <color name="transparent">#55000000</color>
+    <color name="full_transparent">#00000000</color>
     <color name="transparent_blue">#55425DA6</color>
 </resources>

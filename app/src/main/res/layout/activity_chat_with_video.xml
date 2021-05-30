@@ -40,22 +40,6 @@
 <!--            android:layout_gravity="center_horizontal|center_vertical"-->
 <!--            android:id="@+id/previewView" />-->
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/transparent">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/chat_with_vid_appbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:navigationIcon="@drawable/ic_arrow_back_white"
-                android:background="@color/transparent_blue"
-                app:menu="@menu/appbar_chat_with_camera"
-                style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
-
-        </com.google.android.material.appbar.AppBarLayout>
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/textContentLayout"
             android:layout_width="match_parent"
@@ -149,5 +133,28 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|center_vertical"
             android:visibility="invisible" />
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="0dp"
+            app:elevation="0dp"
+            android:backgroundTint="@color/full_transparent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/chat_with_vid_appbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:navigationIcon="@drawable/ic_arrow_back_white"
+                android:backgroundTint="@color/transparent"
+                app:menu="@menu/appbar_chat_with_camera"
+                app:title="Isyarat Langsung"
+                app:titleCentered="true"
+                app:titleTextColor="@color/white"
+                android:elevation="0dp"
+                app:elevation="0dp"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
