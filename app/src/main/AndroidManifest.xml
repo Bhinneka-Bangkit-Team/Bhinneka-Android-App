@@ -32,6 +32,7 @@
         <activity android:name=".ui.auth.LoginActivity" />
         <activity android:name=".ui.auth.DaftarActivity" />
         <activity android:name=".ui.onboarding.OnboardingActivity" />
+        <activity android:name=".engines.MediaPipeActivity" />
         <activity
             android:name=".ui.splash.SplashscreenActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">

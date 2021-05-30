@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.capstone.komunitas.R
 import com.capstone.komunitas.data.db.entities.Chat
-import com.capstone.komunitas.databinding.ActivityChatNoVideoBinding
 import com.capstone.komunitas.databinding.ActivityChatWithVideoBinding
 import com.capstone.komunitas.util.*
 import com.google.common.util.concurrent.ListenableFuture
@@ -37,12 +36,6 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        cameraProviderFuture.addListener(Runnable {
-            val cameraProvider = cameraProviderFuture.get()
-            bindPreview(cameraProvider)
-        }, ContextCompat.getMainExecutor(this))
-
         // ViewModel binding
         val binding: ActivityChatWithVideoBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_chat_with_video)
@@ -50,15 +43,56 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         binding.viewmodel = viewModel
 
         viewModel.chatListener = this
+        viewModel.lensFacing = CameraSelector.LENS_FACING_BACK
+
         bindUI(viewModel)
+        bindCamera(viewModel.lensFacing)
+        bindAppBar(viewModel)
     }
 
-    fun bindPreview(cameraProvider : ProcessCameraProvider) {
-        var preview : Preview = Preview.Builder()
+//    override fun onResume() {
+//        super.onResume()
+//        KeyboardEventListener(this) { isOpen ->
+//            if(isOpen){
+//                layout_control_withvid.hide()
+//            }else{
+//                layout_control_withvid.show()
+//            }
+//        }
+//    }
+
+    fun bindAppBar(viewModel: ChatViewModel){
+        // Back listener
+        chat_with_vid_appbar.setNavigationOnClickListener {
+            onBack()
+        }
+        // Menu listener
+        chat_with_vid_appbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.flip_camera -> {
+                    viewModel.changeLens()
+                    false
+                }
+                else -> false
+            }
+        }
+    }
+
+    fun bindCamera(lensFacing: Int){
+        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture.addListener(Runnable {
+            val cameraProvider = cameraProviderFuture.get()
+            cameraProvider.unbindAll()
+            bindPreview(cameraProvider, lensFacing)
+        }, ContextCompat.getMainExecutor(this))
+    }
+
+    fun bindPreview(cameraProvider : ProcessCameraProvider, lensFacing: Int) {
+        val preview : Preview = Preview.Builder()
             .build()
 
-        var cameraSelector : CameraSelector = CameraSelector.Builder()
-            .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+        val cameraSelector : CameraSelector = CameraSelector.Builder()
+            .requireLensFacing(lensFacing)
             .build()
 
         preview.setSurfaceProvider(previewView.getSurfaceProvider())
@@ -90,6 +124,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             setHasFixedSize(true)
             adapter = groupAdapter
         }
+        messagesRecyclerView.scrollToPosition(groupAdapter.itemCount -1)
     }
 
     override fun onGetStarted() {
@@ -114,5 +149,21 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
 
     override fun onSendFailure(message: String) {
         toast(message)
+    }
+
+    override fun onBack() {
+        this.finish()
+    }
+
+    override fun onChangeLens(lensFacing: Int) {
+        bindCamera(lensFacing)
+    }
+
+    override fun onRecordPressed(isRecording: Boolean) {
+        if(isRecording){
+            btnrecord_chat_withvid.setImageResource(R.drawable.ic_stop_white)
+        }else{
+            btnrecord_chat_withvid.setImageResource(R.drawable.ic_record_white)
+        }
     }
 }

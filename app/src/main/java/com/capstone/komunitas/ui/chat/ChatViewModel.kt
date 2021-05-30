@@ -1,5 +1,6 @@
 package com.capstone.komunitas.ui.chat
 
+import androidx.camera.core.CameraSelector
 import androidx.lifecycle.ViewModel
 import com.capstone.komunitas.data.repositories.ChatRepository
 import com.capstone.komunitas.engines.TextToSpeechEngine
@@ -14,9 +15,20 @@ class ChatViewModel(
 ) : ViewModel() {
     var chatListener: ChatListener? = null
     var newMessageText: String? = null
+    var isRecording: Boolean = false
+    var lensFacing = CameraSelector.LENS_FACING_BACK
 
     val chats by lazyDeferred {
         repository.getChat()
+    }
+
+    fun changeLens(){
+        lensFacing = if (CameraSelector.LENS_FACING_FRONT == lensFacing) {
+            CameraSelector.LENS_FACING_BACK
+        } else {
+            CameraSelector.LENS_FACING_FRONT
+        }
+        chatListener?.onChangeLens(lensFacing)
     }
 
     fun<T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>>{
@@ -25,6 +37,15 @@ class ChatViewModel(
                 block.invoke(this)
             }
         }
+    }
+
+    fun onRecordPressed(){
+        isRecording = !isRecording
+        chatListener?.onRecordPressed(isRecording)
+    }
+
+    fun speechChat(text: String?){
+        textToSpeechEngine.textToSpeech(text!!)
     }
 
     fun sendMessagePressed() {
@@ -41,7 +62,7 @@ class ChatViewModel(
                 val chatResponse = repository.sendChat(newMessageText!!, 0)
                 chatResponse?.let {
                     if (it.data!!.size > 0) {
-                        textToSpeechEngine.textToSpeech(newMessageText!!)
+                        speechChat(newMessageText!!)
                         repository.saveChat(it.data)
                         chatListener?.onSendSuccess("Berhasil mengambil pesan")
                         newMessageText = null

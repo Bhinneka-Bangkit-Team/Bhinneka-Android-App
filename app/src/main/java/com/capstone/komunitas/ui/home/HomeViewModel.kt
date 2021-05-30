@@ -4,6 +4,7 @@ import android.content.Intent
 import android.view.View
 import androidx.lifecycle.ViewModel
 import com.capstone.komunitas.data.repositories.UserRepository
+import com.capstone.komunitas.engines.MediaPipeActivity
 import com.capstone.komunitas.ui.auth.LoginActivity
 import com.capstone.komunitas.ui.chat.ChatNoVideoActivity
 import com.capstone.komunitas.ui.chat.ChatWithVideoActivity
@@ -23,6 +24,12 @@ class HomeViewModel(
 
     fun onShowChatWithVideo(view: View){
         Intent(view.context, ChatWithVideoActivity::class.java).also{
+            view.context.startActivity(it)
+        }
+    }
+
+    fun onShowMediaPipe(view: View){
+        Intent(view.context, MediaPipeActivity::class.java).also{
             view.context.startActivity(it)
         }
     }
