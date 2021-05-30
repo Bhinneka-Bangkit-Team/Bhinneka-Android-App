@@ -1,8 +1,11 @@
 package com.capstone.komunitas.data.network
 
+import com.capstone.komunitas.data.network.responses.AudioResponse
 import com.capstone.komunitas.data.network.responses.AuthResponse
 import com.capstone.komunitas.data.network.responses.ChatResponse
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
@@ -40,6 +43,21 @@ interface BackendApi {
         @Field("isSpeaker") isSpeaker: Int,
         @Field("lang") lang: String
     ): Response<ChatResponse>
+
+
+    @POST("/api/google/stt")
+    suspend fun sendAudio(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody,
+        @Query("lang") language:String
+    ):Response<AudioResponse>
+
+    @POST("/api/google/tts")
+    suspend fun getAudio(
+        @Header("Authorization") accessToken: String,
+        @Field("text") text: String,
+        @Field("lang") lang: String
+    )
 
     companion object {
         operator fun invoke(

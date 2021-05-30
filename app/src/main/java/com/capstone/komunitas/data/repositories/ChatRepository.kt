@@ -7,10 +7,13 @@ import com.capstone.komunitas.data.db.PreferenceProvider
 import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.data.network.BackendApi
 import com.capstone.komunitas.data.network.SafeApiRequest
+import com.capstone.komunitas.data.network.responses.AudioResponse
 import com.capstone.komunitas.data.network.responses.ChatResponse
 import com.capstone.komunitas.util.Coroutines
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -73,6 +76,13 @@ class ChatRepository(
         Coroutines.io {
             prefs.savelastSavedAt(LocalDateTime.now().toString())
             db.getChatDao().saveAllChat(chats)
+        }
+    }
+
+    suspend fun sendAudio(lang:String,requestBody: RequestBody): AudioResponse {
+        val token = "Bearer "+prefs.getAuthToken()
+        return apiRequest {
+            api.sendAudio(token,requestBody,lang)
         }
     }
 }
