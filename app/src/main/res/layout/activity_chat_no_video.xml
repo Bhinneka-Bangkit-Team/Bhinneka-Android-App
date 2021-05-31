@@ -16,22 +16,6 @@
         android:background="@color/white"
         tools:context=".ui.auth.LoginActivity">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/chat_no_vid_appbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:title="Tuliskan Percakapan"
-                app:titleTextColor="@color/blue"
-                app:navigationIcon="@drawable/ic_arrow_back"
-                android:backgroundTint="@color/white"
-                style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
-
-        </com.google.android.material.appbar.AppBarLayout>
-
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/root_layout_chat_novid"
@@ -120,6 +104,23 @@
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/chat_no_vid_appbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:title="Tuliskan Percakapan"
+                app:titleCentered="true"
+                app:titleTextColor="@color/blue"
+                app:navigationIcon="@drawable/ic_arrow_back"
+                android:backgroundTint="@color/white"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
 
         <ProgressBar
             android:id="@+id/progress_bar_chat_novideo"

@@ -124,7 +124,7 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         this.finish()
     }
 
-    override fun onChangeLens(lensFacing: Int) {
+    override fun onChangeLens() {
         return
     }
 

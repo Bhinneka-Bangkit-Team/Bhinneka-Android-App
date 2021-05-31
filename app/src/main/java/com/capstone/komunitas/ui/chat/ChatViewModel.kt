@@ -1,20 +1,13 @@
 package com.capstone.komunitas.ui.chat
 
-import android.media.MediaParser
-import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.lifecycle.ViewModel
 import com.capstone.komunitas.data.repositories.ChatRepository
-import com.capstone.komunitas.engines.AudioRecord
 import com.capstone.komunitas.engines.TextToSpeechEngine
 import com.capstone.komunitas.util.ApiException
 import com.capstone.komunitas.util.Coroutines
 import com.capstone.komunitas.util.NoInternetException
 import kotlinx.coroutines.*
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import java.io.File
 
 class ChatViewModel(
     private val repository: ChatRepository,
@@ -24,7 +17,6 @@ class ChatViewModel(
     var newMessageText: String? = null
     var isRecording: Boolean = false
     var lensFacing = CameraSelector.LENS_FACING_BACK
-    val audioRecord = AudioRecord()
 
     val chats by lazyDeferred {
         repository.getChat()
@@ -50,14 +42,6 @@ class ChatViewModel(
     fun onRecordPressed(){
         isRecording = !isRecording
         chatListener?.onRecordPressed(isRecording)
-        if (isRecording){
-            audioRecord.startRecording()
-        }else{
-            audioRecord.stopRecording()
-            val requestBody = RequestBody.create(MediaType.parse("audio/*"),audioRecord.uploadFile())
-            val body = MultipartBody.Part.createFormData("file",audioRecord.uploadFile().name,requestBody)
-            sendAudio(audioRecord.uploadFile())
-        }
     }
 
     fun speechChat(text: String?){
@@ -90,28 +74,6 @@ class ChatViewModel(
                 chatListener?.onSendFailure(e.message!!)
             } catch (e: NoInternetException) {
                 chatListener?.onSendFailure(e.message!!)
-            }
-        }
-    }
-
-    fun sendAudio(body: File){
-        Coroutines.main {
-            try {
-                val responseTTS = repository.sendAudio(body)
-                Log.d("AudioRecord", "sendAudio: $responseTTS" )
-//                responseTTS?.let {
-//                    if (it.data?.length!! > 0){
-////                        speechChat(newMessageText!!)
-////                        repository.saveChat(it.data)
-//                        chatListener?.onSendSuccess("Berhasil mengambil audio pesan")
-//                        newMessageText = null
-//                        return@main
-//                    }
-//                }
-            }catch (e: ApiException){
-                Log.e("AudioRecord", "sendAudio: $e" )
-            }catch (e:NoInternetException){
-                Log.e("AudioRecord", "sendAudio: $e" )
             }
         }
     }
