@@ -1,13 +1,21 @@
 package com.capstone.komunitas.ui.chat
 
+import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.lifecycle.ViewModel
 import com.capstone.komunitas.data.repositories.ChatRepository
+import com.capstone.komunitas.engines.AudioRecord
 import com.capstone.komunitas.engines.TextToSpeechEngine
 import com.capstone.komunitas.util.ApiException
 import com.capstone.komunitas.util.Coroutines
 import com.capstone.komunitas.util.NoInternetException
 import kotlinx.coroutines.*
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
+import java.io.InputStream
+import kotlin.coroutines.coroutineContext
 
 class ChatViewModel(
     private val repository: ChatRepository,
@@ -17,6 +25,7 @@ class ChatViewModel(
     var newMessageText: String? = null
     var isRecording: Boolean = false
     var lensFacing = CameraSelector.LENS_FACING_BACK
+    val audioRecord = AudioRecord()
 
     val chats by lazyDeferred {
         repository.getChat()
@@ -28,7 +37,7 @@ class ChatViewModel(
         } else {
             CameraSelector.LENS_FACING_FRONT
         }
-        chatListener?.onChangeLens(lensFacing)
+       // chatListener?.onChangeLens(lensFacing)
     }
 
     fun<T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>>{
@@ -42,6 +51,16 @@ class ChatViewModel(
     fun onRecordPressed(){
         isRecording = !isRecording
         chatListener?.onRecordPressed(isRecording)
+        if (isRecording){
+            audioRecord.startRecording()
+        }else{
+            audioRecord.stopRecording()
+            val requestBody = RequestBody.create(MediaType.parse("audio/*"),audioRecord.uploadFile())
+            val lang = RequestBody.create(MediaType.parse("text/plain"),"en-US")
+            val body = MultipartBody.Part.createFormData("file",audioRecord.uploadFile().name,requestBody)
+            sendAudio(body,lang)
+
+        }
     }
 
     fun speechChat(text: String?){
@@ -77,4 +96,31 @@ class ChatViewModel(
             }
         }
     }
+
+    fun sendAudio(body:MultipartBody.Part,lang:RequestBody){
+
+
+
+        Coroutines.main {
+            try {
+                val responseTTS = repository.sendAudio(body,lang)
+                Log.d("AudioRecord", "sendAudio: $responseTTS" )
+//                responseTTS?.let {
+//                    if (it.data?.length!! > 0){
+////                        speechChat(newMessageText!!)
+////                        repository.saveChat(it.data)
+//                        chatListener?.onSendSuccess("Berhasil mengambil audio pesan")
+//                        newMessageText = null
+//                        return@main
+//                    }
+//                }
+            }catch (e: ApiException){
+                Log.e("AudioRecord", "sendAudio: $e" )
+            }catch (e:NoInternetException){
+                Log.e("AudioRecord", "sendAudio: $e" )
+            }
+        }
+    }
+
+
 }

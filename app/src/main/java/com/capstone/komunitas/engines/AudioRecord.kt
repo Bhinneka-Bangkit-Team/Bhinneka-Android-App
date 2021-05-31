@@ -1,11 +1,10 @@
 package com.capstone.komunitas.engines
 
 import android.media.MediaRecorder
-import android.net.Uri
 import android.os.Environment
 import android.util.Log
+import okhttp3.ResponseBody
 import java.io.*
-import java.lang.Exception
 
 class AudioRecord{
     private lateinit var recorder:MediaRecorder
@@ -70,6 +69,48 @@ class AudioRecord{
 
     fun uploadFile():File{
         return File(fileOutput)
+    }
+
+    fun saveIntoAudio(responseBody: ResponseBody):Boolean{
+        try {
+            var finalFile  =File(Environment.getExternalStorageDirectory().absolutePath+"/recording_download.3gp")
+            var inputStream:InputStream? = null
+            var outputStream:OutputStream? =null
+
+            try {
+                val fileReader = ByteArray(1024)
+                var fileSize = responseBody.contentLength()
+                var fileSizeDownloaded = 0
+
+                 inputStream = responseBody.byteStream()
+                outputStream = FileOutputStream(finalFile)
+                while (true){
+                    var read = inputStream.read(fileReader)
+                    if (read == -1){
+                        break
+                    }
+                    outputStream.write(fileReader,0,read)
+                    fileSizeDownloaded += read
+
+                    Log.d(TAG_AUDIO, "File Download: " + fileSizeDownloaded + " of " + fileSize)
+                }
+                outputStream.flush()
+                return true
+            }catch (e:IOException){
+                Log.e(TAG_AUDIO, "File Download: $e")
+               return false
+            }finally {
+                if (inputStream != null){
+                    inputStream.close()
+                }
+
+                if (outputStream!=null){
+                    outputStream.close()
+                }
+            }
+        }catch (e:IOException){
+                return false
+        }
     }
 
     companion object{

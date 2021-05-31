@@ -20,10 +20,12 @@ abstract class SafeApiRequest {
                 try{
                     message.append(JSONObject(it).get("message"))
                     Log.e("SafeApiRequest", "apiRequest: $it" )
+                    message.append(JSONObject(it).get("\n"))
                 }catch(e: JSONException){
                     Log.e("SafeApiRequest", "apiRequest: $e" )
+
                 }
-                message.append(JSONObject(it).get("\n"))
+
             }
             message.append("Error Code: ${response.code()}")
             throw ApiException(message.toString())

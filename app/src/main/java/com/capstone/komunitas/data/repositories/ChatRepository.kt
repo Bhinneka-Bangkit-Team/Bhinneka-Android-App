@@ -13,6 +13,7 @@ import com.capstone.komunitas.data.network.responses.ChatResponse
 import com.capstone.komunitas.util.Coroutines
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
@@ -88,10 +89,28 @@ class ChatRepository(
 //        }
 //    }
 
-    suspend fun sendAudio(requestBody: File): AudioResponse {
+    suspend fun sendAudio(multi: MultipartBody.Part,lang:RequestBody): AudioResponse {
         val token = "Bearer "+prefs.getAuthToken()
+//        return apiRequest {
+//            api.sendAudio(token,requestBody,"id-ID")
+//        }
+
         return apiRequest {
-            api.sendAudio(token,requestBody,"id-ID")
+            api.sendAudioTest(token,multi,lang)
         }
     }
+
+    suspend fun downloadAudio(){
+        val coroutine = withContext(Dispatchers.IO){
+            val response = apiRequest {
+                api.getAudio("Bearer "+prefs.getAuthToken(),"test","id-ID")
+            }
+
+        }
+        Log.d("TAG", "downloadAudio: Successfull?")
+        return coroutine
+    }
+
+
+
 }

@@ -46,26 +46,29 @@ interface BackendApi {
     ): Response<ChatResponse>
 
 
-//    @POST("/api/google/stt")
-//    suspend fun sendAudio(
-//        @Header("Authorization") accessToken: String,
-//        @Body requestBody: RequestBody,
-//        @Query("lang") language:String
-//    ):Response<AudioResponse>
     @FormUrlEncoded
-    @POST("/api/google/stt")
+    @POST("google/stt")
     suspend fun sendAudio(
     @Header("Authorization") accessToken: String,
     @Field("file") file: File,
     @Field("lang") lang: String
     ):Response<AudioResponse>
 
-    @POST("/api/google/tts")
+    @Multipart
+    @POST("google/stt")
+    suspend fun sendAudioTest(
+    @Header("Authorization") accessToken: String,
+    @Part file: MultipartBody.Part,
+    @Part("lang") lang: RequestBody
+    ):Response<AudioResponse>
+
+    @FormUrlEncoded
+    @POST("google/tts")
     suspend fun getAudio(
         @Header("Authorization") accessToken: String,
         @Field("text") text: String,
         @Field("lang") lang: String
-    )
+    ):Response<ResponseBody>
 
     companion object {
         operator fun invoke(
