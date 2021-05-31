@@ -1,5 +1,6 @@
 package com.capstone.komunitas.data.repositories
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.capstone.komunitas.data.db.AppDatabase
@@ -14,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.io.File
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -79,10 +81,17 @@ class ChatRepository(
         }
     }
 
-    suspend fun sendAudio(lang:String,requestBody: RequestBody): AudioResponse {
+//    suspend fun sendAudio(lang:String,requestBody: RequestBody): AudioResponse {
+//        val token = "Bearer "+prefs.getAuthToken()
+//        return apiRequest {
+//            api.sendAudio(token,requestBody,lang)
+//        }
+//    }
+
+    suspend fun sendAudio(requestBody: File): AudioResponse {
         val token = "Bearer "+prefs.getAuthToken()
         return apiRequest {
-            api.sendAudio(token,requestBody,lang)
+            api.sendAudio(token,requestBody,"id-ID")
         }
     }
 }

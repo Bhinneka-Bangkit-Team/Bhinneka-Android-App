@@ -12,6 +12,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
+import java.io.File
 
 interface BackendApi {
     @FormUrlEncoded
@@ -45,11 +46,18 @@ interface BackendApi {
     ): Response<ChatResponse>
 
 
+//    @POST("/api/google/stt")
+//    suspend fun sendAudio(
+//        @Header("Authorization") accessToken: String,
+//        @Body requestBody: RequestBody,
+//        @Query("lang") language:String
+//    ):Response<AudioResponse>
+    @FormUrlEncoded
     @POST("/api/google/stt")
     suspend fun sendAudio(
-        @Header("Authorization") accessToken: String,
-        @Body requestBody: RequestBody,
-        @Query("lang") language:String
+    @Header("Authorization") accessToken: String,
+    @Field("file") file: File,
+    @Field("lang") lang: String
     ):Response<AudioResponse>
 
     @POST("/api/google/tts")

@@ -12,7 +12,9 @@ import com.capstone.komunitas.util.Coroutines
 import com.capstone.komunitas.util.NoInternetException
 import kotlinx.coroutines.*
 import okhttp3.MediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.io.File
 
 class ChatViewModel(
     private val repository: ChatRepository,
@@ -52,9 +54,9 @@ class ChatViewModel(
             audioRecord.startRecording()
         }else{
             audioRecord.stopRecording()
-            sendAudio(
-                RequestBody.create(MediaType.parse("audio/*"),audioRecord.uploadFile())
-            )
+            val requestBody = RequestBody.create(MediaType.parse("audio/*"),audioRecord.uploadFile())
+            val body = MultipartBody.Part.createFormData("file",audioRecord.uploadFile().name,requestBody)
+            sendAudio(audioRecord.uploadFile())
         }
     }
 
@@ -92,10 +94,10 @@ class ChatViewModel(
         }
     }
 
-    fun sendAudio(requestBody: RequestBody){
+    fun sendAudio(body: File){
         Coroutines.main {
             try {
-                val responseTTS = repository.sendAudio("id-ID",requestBody)
+                val responseTTS = repository.sendAudio(body)
                 Log.d("AudioRecord", "sendAudio: $responseTTS" )
 //                responseTTS?.let {
 //                    if (it.data?.length!! > 0){
