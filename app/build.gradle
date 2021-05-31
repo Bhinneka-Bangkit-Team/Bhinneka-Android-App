@@ -93,6 +93,7 @@ dependencies {
 
     // Tensorflow lite
     implementation 'org.tensorflow:tensorflow-lite:2.5.0'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.2.0'
 
     // MediaPipe deps
     implementation 'com.google.flogger:flogger:0.3.1'

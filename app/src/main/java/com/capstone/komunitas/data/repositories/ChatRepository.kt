@@ -75,4 +75,6 @@ class ChatRepository(
             db.getChatDao().saveAllChat(chats)
         }
     }
+
+    suspend fun deleteChats() = db.getChatDao().deleteChats()
 }

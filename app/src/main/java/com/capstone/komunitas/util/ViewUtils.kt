@@ -8,7 +8,9 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -16,6 +18,18 @@ fun Context.toast(message: String){
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }
 
+fun RecyclerView.show(){
+    visibility = View.VISIBLE
+}
+fun RecyclerView.hide(){
+    visibility = View.GONE
+}
+fun TextView.show(){
+    visibility = View.VISIBLE
+}
+fun TextView.hide(){
+    visibility = View.GONE
+}
 fun LinearLayout.show(){
     visibility = View.VISIBLE
 }

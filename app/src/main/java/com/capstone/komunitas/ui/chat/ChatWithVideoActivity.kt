@@ -1,7 +1,7 @@
 package com.capstone.komunitas.ui.chat
 
+import android.content.res.AssetFileDescriptor
 import android.graphics.SurfaceTexture
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
@@ -9,12 +9,9 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.content.ContextCompat
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +19,6 @@ import com.capstone.komunitas.R
 import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.databinding.ActivityChatWithVideoBinding
 import com.capstone.komunitas.util.*
-import com.google.common.util.concurrent.ListenableFuture
 import com.google.mediapipe.components.*
 import com.google.mediapipe.formats.proto.LandmarkProto
 import com.google.mediapipe.framework.AndroidAssetUtil
@@ -31,14 +27,23 @@ import com.google.mediapipe.framework.Packet
 import com.google.mediapipe.framework.PacketGetter
 import com.google.mediapipe.glutil.EglManager
 import com.xwray.groupie.GroupieAdapter
-import kotlinx.android.synthetic.main.activity_chat_no_video.*
-import kotlinx.android.synthetic.main.activity_chat_no_video.messagesRecyclerView
 import kotlinx.android.synthetic.main.activity_chat_no_video.progress_bar_chat_novideo
 import kotlinx.android.synthetic.main.activity_chat_with_video.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
-import java.util.HashMap
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.support.common.FileUtil
+import java.io.FileInputStream
+import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.ByteOrder.nativeOrder
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.set
+
 
 class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
 
@@ -61,6 +66,17 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         }
     }
 
+    // TFLite things
+    val tfliteInterpreter by lazy {
+        Interpreter(loadModelFile())
+    }
+    val tfliteInputBuffer = ByteBuffer.allocateDirect(4 * 42 * 1)
+        .apply { order(nativeOrder()) }
+    val ASSOCIATED_AXIS_LABELS = "sign_language_v1.txt"
+    var associatedAxisLabels: List<String>? = null
+
+
+    // MediaPipe things
     private var lensFacing: CameraHelper.CameraFacing = CameraHelper.CameraFacing.FRONT
     private var isSurfaceAttached: Boolean = false
     private var previewFrameTexture: SurfaceTexture? = null
@@ -87,6 +103,24 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         bindAppBar(viewModel)
     }
 
+    private fun loadLabelFile() {
+        try {
+            associatedAxisLabels = FileUtil.loadLabels(this, ASSOCIATED_AXIS_LABELS)
+        } catch (e: IOException) {
+            Log.e("tfliteSupport", "Error reading label file", e)
+        }
+    }
+
+    private fun loadModelFile(): MappedByteBuffer {
+        loadLabelFile()
+        val fileDescriptor: AssetFileDescriptor = assets.openFd("sign_language_v1.tflite")
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel: FileChannel = inputStream.channel
+        val startOffset: Long = fileDescriptor.startOffset
+        val declaredLength: Long = fileDescriptor.declaredLength
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+    }
+
     fun initMediaPipe() {
         previewDisplayView = SurfaceView(this)
         setupPreviewDisplayView()
@@ -108,25 +142,122 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         inputSidePackets[INPUT_NUM_HANDS_SIDE_PACKET_NAME] =
             packetCreator.createInt32(NUM_HANDS)
         processor!!.setInputSidePackets(inputSidePackets)
-        if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            processor!!.addPacketCallback(
-                OUTPUT_LANDMARKS_STREAM_NAME
-            ) { packet ->
-                Log.v(TAG, "Received multi-hand landmarks packet.")
-                val multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList> =
-                    PacketGetter.getProtoVector(
-                        packet,
-                        LandmarkProto.NormalizedLandmarkList.parser()
-                    )
-                Log.v(
-                    TAG,
-                    ("[TS:"
-                            + packet.getTimestamp()
-                            ) + "] " + getMultiHandLandmarksDebugString(multiHandLandmarks)
+
+        processor!!.addPacketCallback(
+            OUTPUT_LANDMARKS_STREAM_NAME
+        ) { packet ->
+            val multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList> =
+                PacketGetter.getProtoVector(
+                    packet,
+                    LandmarkProto.NormalizedLandmarkList.parser()
                 )
-            }
+            inferenceHandLandmarks(multiHandLandmarks)
         }
     }
+
+    private fun inferenceHandLandmarks(multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>) {
+
+        if (multiHandLandmarks.isEmpty()) {
+            return
+        }
+
+        var handIndex = 0
+        for (landmarks: LandmarkProto.NormalizedLandmarkList in multiHandLandmarks) {
+            var resultList: MutableList<Float> = ArrayList()
+
+            var landmarkIndex = 0
+            for (landmark: LandmarkProto.NormalizedLandmark in landmarks.getLandmarkList()) {
+                resultList.add(landmark.getX())
+                resultList.add(landmark.getY())
+                ++landmarkIndex
+            }
+
+//            val probabilityBuffer =
+//                TensorBuffer.createFixedSize(intArrayOf(1, 1001), DataType.UINT8)
+//            resultList.unwindToByteBuffer(tfliteInputBuffer)
+//            tfliteInterpreter.run(tfliteInputBuffer, probabilityBuffer.buffer)
+//            mapOutputToLabels(probabilityBuffer)
+
+            val outputArray = arrayOf(FloatArray(36))
+            resultList.unwindToByteBuffer(tfliteInputBuffer)
+            tfliteInterpreter.run(tfliteInputBuffer, outputArray)
+            var labelResult = getTopLabel(outputArray[0])
+            val (label, likelihood) = labelResult[0]
+            this.runOnUiThread {
+                tv_preview_isyarat.text = label
+            }
+            ++handIndex
+        }
+    }
+
+    fun getTopLabel(output: FloatArray): List<Prediction> {
+        // Get top 10 predictions, sorted
+        val predictions = mutableListOf<Prediction>()
+
+        output.forEachIndexed { index, fl ->
+            val prediction = associatedAxisLabels?.get(index).toString() to fl
+            val (currentLabel, currentLikelihood) = prediction
+
+            if (predictions.size < 10) {
+                predictions.add(prediction)
+            } else {
+                val shouldReplace = predictions.find {
+                    val (label, likelihood) = it
+                    likelihood < currentLikelihood
+                }
+
+                if (shouldReplace != null) {
+                    predictions[predictions.indexOf(shouldReplace)] = prediction
+                }
+            }
+        }
+
+        return predictions
+    }
+
+//    fun mapOutputToLabels(probabilityBuffer: TensorBuffer) {
+//        val probabilityProcessor = TensorProcessor.Builder().add(NormalizeOp((0).toFloat(), (255).toFloat())).build()
+//
+//        if (null != associatedAxisLabels) {
+//            // Map of labels and their corresponding probability
+//            val labels = TensorLabel(
+//                associatedAxisLabels!!,
+//                probabilityProcessor.process(probabilityBuffer)
+//            )
+//
+//            // Create a map to access the result based on label
+//            val floatMap = labels.mapWithFloatValue
+//        }
+//    }
+
+//    fun getTopPrediction(output: FloatArray): List<Prediction> {
+//        val predictions = mutableListOf<Prediction>()
+//
+//        output.forEachIndexed { index, fl ->
+//            val prediction = (index + 1) to fl
+//            val (currentLabel, currentLikelihood) = prediction
+//
+//            if (predictions.size < 10) {
+//                predictions.add(prediction)
+//            } else {
+//                val shouldReplace = predictions.find {
+//                    val (label, likelihood) = it
+//                    likelihood < currentLikelihood
+//                }
+//
+//                if (shouldReplace != null) {
+//                    predictions[predictions.indexOf(shouldReplace)] = prediction
+//                }
+//            }
+//        }
+//        // log output
+//        predictions.forEachIndexed { index, prediction ->
+//            val (label, likelihood) = prediction
+//            Log.d("TensorFlow Interpreter", "${index + 1}. Prediction: $prediction, Likelihood: $likelihood")
+//        }
+//
+//        return predictions
+//    }
 
     override fun onResume() {
         super.onResume()
@@ -185,7 +316,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         val displaySize: Size = cameraHelper!!.computeDisplaySizeFromViewSize(viewSize)
         val isCameraRotated: Boolean = cameraHelper!!.isCameraRotated()
 
-        if(isSurfaceAttached){
+        if (isSurfaceAttached) {
             previewFrameTexture!!.detachFromGLContext()
         }
         isSurfaceAttached = true
@@ -319,12 +450,12 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             }
         }
 
-        messagesRecyclerView.apply {
+        messages_rv_chat_withvid.apply {
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
             adapter = groupAdapter
         }
-        messagesRecyclerView.scrollToPosition(groupAdapter.itemCount - 1)
+        messages_rv_chat_withvid.scrollToPosition(groupAdapter.itemCount - 1)
     }
 
     override fun onGetStarted() {
@@ -365,7 +496,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         }
     }
 
-    private fun restartCamera(){
+    private fun restartCamera() {
         onPause()
         onResume()
     }
@@ -378,3 +509,5 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         }
     }
 }
+
+typealias Prediction = Pair<String, Float>

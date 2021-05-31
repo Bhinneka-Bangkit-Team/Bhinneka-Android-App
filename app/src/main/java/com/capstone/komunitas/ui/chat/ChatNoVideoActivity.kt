@@ -13,7 +13,6 @@ import com.capstone.komunitas.databinding.ActivityChatNoVideoBinding
 import com.capstone.komunitas.util.*
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.android.synthetic.main.activity_chat_no_video.*
-import kotlinx.android.synthetic.main.activity_chat_no_video.messagesRecyclerView
 import kotlinx.android.synthetic.main.activity_chat_no_video.progress_bar_chat_novideo
 import kotlinx.android.synthetic.main.activity_chat_with_video.*
 import org.kodein.di.KodeinAware
@@ -69,20 +68,27 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     private fun initRecyclerView(chatItem: List<Chat>) {
         val groupAdapter = GroupieAdapter()
 
-        chatItem.forEach {
-            if (it.isSpeaker == 1) {
-                groupAdapter.add(ChatReceivedItem(it))
-            } else {
-                groupAdapter.add(ChatSentItem(it))
+        if(chatItem.isEmpty()){
+            layout_chat_novid_nodata.show()
+            messages_rv_chat_novid.hide()
+        }else{
+            layout_chat_novid_nodata.hide()
+            messages_rv_chat_novid.show()
+            chatItem.forEach {
+                if (it.isSpeaker == 1) {
+                    groupAdapter.add(ChatReceivedItem(it))
+                } else {
+                    groupAdapter.add(ChatSentItem(it))
+                }
             }
-        }
 
-        messagesRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            setHasFixedSize(true)
-            adapter = groupAdapter
+            messages_rv_chat_novid.apply {
+                layoutManager = LinearLayoutManager(context)
+                setHasFixedSize(true)
+                adapter = groupAdapter
+            }
+            messages_rv_chat_novid.scrollToPosition(groupAdapter.itemCount - 1)
         }
-        messagesRecyclerView.scrollToPosition(groupAdapter.itemCount - 1)
     }
 
     override fun onGetStarted() {

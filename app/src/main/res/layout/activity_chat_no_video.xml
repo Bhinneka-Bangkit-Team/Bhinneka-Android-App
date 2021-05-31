@@ -23,18 +23,31 @@
             android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/messagesRecyclerView"
+                android:id="@+id/messages_rv_chat_novid"
                 android:scrollbarAlwaysDrawVerticalTrack="true"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:visibility="visible"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toTopOf="@id/layoutChatbox"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:listitem="@layout/list_item_message_received" />
+
+            <TextView
+                android:id="@+id/layout_chat_novid_nodata"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:visibility="gone"
+                android:text="Tidak Ada Data"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <LinearLayout
                 android:id="@+id/layoutChatbox"
@@ -44,8 +57,8 @@
                 android:minHeight="48dp"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toTopOf="@+id/layout_control_novid"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <EditText
                     android:id="@+id/editTextMessage"
@@ -63,7 +76,7 @@
                     android:maxLines="6"
                     android:text="@={viewmodel.newMessageText}" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/sendBtn"
                     android:paddingHorizontal="10dp"
                     android:layout_width="match_parent"
@@ -72,6 +85,8 @@
                     android:layout_marginVertical="5dp"
                     android:layout_weight=".6"
                     android:clickable="true"
+                    android:backgroundTint="@color/blue"
+                    android:src="@drawable/ic_send_white"
                     android:onClick="@{() -> viewmodel.sendMessagePressed()}"
                     android:text="Jawab"
                     android:textSize="14sp" />
