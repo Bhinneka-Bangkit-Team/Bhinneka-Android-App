@@ -43,7 +43,6 @@ class ChatRepository(
         }
     }
 
-
     private suspend fun fetchChats() {
         val lastSavedAt = prefs.getLastSavedAt()
         val token = "Bearer "+prefs.getAuthToken() ?: return
@@ -102,4 +101,6 @@ class ChatRepository(
 
 
 
+
+    suspend fun deleteChats() = db.getChatDao().deleteChats()
 }
