@@ -1,6 +1,7 @@
 package com.capstone.komunitas.data.network
 
 import com.capstone.komunitas.data.network.responses.AudioResponse
+import com.capstone.komunitas.data.network.responses.AudioTranslateResponse
 import com.capstone.komunitas.data.network.responses.AuthResponse
 import com.capstone.komunitas.data.network.responses.ChatResponse
 import okhttp3.MultipartBody
@@ -68,7 +69,7 @@ interface BackendApi {
         @Header("Authorization") accessToken: String,
         @Field("text") text: String,
         @Field("lang") lang: String
-    ):Response<ResponseBody>
+    ):Response<AudioTranslateResponse>
 
     companion object {
         operator fun invoke(

@@ -9,6 +9,7 @@ import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.data.network.BackendApi
 import com.capstone.komunitas.data.network.SafeApiRequest
 import com.capstone.komunitas.data.network.responses.AudioResponse
+import com.capstone.komunitas.data.network.responses.AudioTranslateResponse
 import com.capstone.komunitas.data.network.responses.ChatResponse
 import com.capstone.komunitas.util.Coroutines
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +42,7 @@ class ChatRepository(
             db.getChatDao().getChats()
         }
     }
+
 
     private suspend fun fetchChats() {
         val lastSavedAt = prefs.getLastSavedAt()
@@ -82,33 +84,20 @@ class ChatRepository(
         }
     }
 
-//    suspend fun sendAudio(lang:String,requestBody: RequestBody): AudioResponse {
-//        val token = "Bearer "+prefs.getAuthToken()
-//        return apiRequest {
-//            api.sendAudio(token,requestBody,lang)
-//        }
-//    }
-
     suspend fun sendAudio(multi: MultipartBody.Part,lang:RequestBody): AudioResponse {
         val token = "Bearer "+prefs.getAuthToken()
-//        return apiRequest {
-//            api.sendAudio(token,requestBody,"id-ID")
-//        }
-
         return apiRequest {
             api.sendAudioTest(token,multi,lang)
         }
     }
 
-    suspend fun downloadAudio(){
-        val coroutine = withContext(Dispatchers.IO){
-            val response = apiRequest {
-                api.getAudio("Bearer "+prefs.getAuthToken(),"test","id-ID")
-            }
+    suspend fun downloadAudio(text:String):AudioTranslateResponse{
 
+        return withContext(Dispatchers.IO){
+            apiRequest {
+                api.getAudio("Bearer "+prefs.getAuthToken(),text,"id-ID")
+            }
         }
-        Log.d("TAG", "downloadAudio: Successfull?")
-        return coroutine
     }
 
 

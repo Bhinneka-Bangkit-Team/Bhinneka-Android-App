@@ -32,10 +32,6 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     override val kodein by kodein()
 
     private val factory: ChatViewModelFactory by instance()
-    private val audioRecorder:AudioRecord = AudioRecord()
-
-    private lateinit var recorder: MediaRecorder
-    private lateinit var fileOutput:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +63,7 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         chat_no_vid_appbar.setNavigationOnClickListener {
             onBack()
         }
+
     }
 
     private fun bindUI(viewModel: ChatViewModel) = Coroutines.main {
@@ -131,10 +128,10 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     override fun onRecordPressed(isRecording: Boolean) {
         if(isRecording){
             btnrecord_chat_novid.setImageResource(R.drawable.ic_stop_white)
-            startRecording()
+
         }else{
             btnrecord_chat_novid.setImageResource(R.drawable.ic_record_white)
-            stopRecording()
+
         }
     }
 
@@ -155,59 +152,6 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         }
     }
 
-    private fun startRecording(){
-        recorder = MediaRecorder()
-        fileOutput = Environment.getExternalStorageDirectory().absolutePath+"/AudioRecording.3gp"
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-        recorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB)
-
-        try {
-            recorder.setOutputFile(fileOutput)
-        }catch (e: Exception){
-            Log.e(TAG_AUDIO, "startRecording: OutputFailed $e" )
-        }
-
-        try{
-            recorder.prepare()
-            recorder.start()
-        }catch (e: Exception){
-            e.printStackTrace()
-            Log.e(TAG_AUDIO, "startRecording: Failed to start! $e" )
-        }
-    }
-
-    private fun stopRecording(){
-
-        try{
-            recorder.stop()
-            recorder.reset()
-            recorder.release()
-        }catch (e: Exception){
-            e.printStackTrace()
-            Log.e(TAG_AUDIO, "startRecording: Failed to stop! $e" )
-        }
-
-    }
-
-    private fun readFile(){
-        var inputStream: InputStream? = null
-        try {
-            inputStream = BufferedInputStream(FileInputStream(fileOutput))
-        }catch (e: FileNotFoundException){
-            e.printStackTrace()
-        }
-
-        finally {
-            if (inputStream!=null){
-                try {
-                    inputStream.close()
-                }catch (e: IOException){
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
 
 
 

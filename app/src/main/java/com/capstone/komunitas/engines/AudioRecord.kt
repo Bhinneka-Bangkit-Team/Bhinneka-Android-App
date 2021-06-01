@@ -3,7 +3,7 @@ package com.capstone.komunitas.engines
 import android.media.MediaRecorder
 import android.os.Environment
 import android.util.Log
-import okhttp3.ResponseBody
+import com.capstone.komunitas.data.network.responses.AudioTranslateResponse
 import java.io.*
 
 class AudioRecord{
@@ -71,18 +71,24 @@ class AudioRecord{
         return File(fileOutput)
     }
 
-    fun saveIntoAudio(responseBody: ResponseBody):Boolean{
+    fun saveIntoAudio(responseBody: AudioTranslateResponse):Boolean{
         try {
-            var finalFile  =File(Environment.getExternalStorageDirectory().absolutePath+"/recording_download.3gp")
+
+            var finalFile  = File(Environment.getExternalStorageDirectory().absolutePath+"/recording_download.3gp")
             var inputStream:InputStream? = null
             var outputStream:OutputStream? =null
 
             try {
                 val fileReader = ByteArray(1024)
-                var fileSize = responseBody.contentLength()
-                var fileSizeDownloaded = 0
+                val responseAudioIntArray = responseBody.data?.data
 
-                 inputStream = responseBody.byteStream()
+                var fileSizeDownloaded = 0
+                val byte = ByteArrayInputStream(responseAudioIntArray?.remaining()?.let {
+                    ByteArray(
+                        it
+                    )
+                })
+                 inputStream = BufferedInputStream(byte)
                 outputStream = FileOutputStream(finalFile)
                 while (true){
                     var read = inputStream.read(fileReader)
@@ -92,7 +98,7 @@ class AudioRecord{
                     outputStream.write(fileReader,0,read)
                     fileSizeDownloaded += read
 
-                    Log.d(TAG_AUDIO, "File Download: " + fileSizeDownloaded + " of " + fileSize)
+                    Log.d(TAG_AUDIO, "File Download: " + fileSizeDownloaded + " of ")
                 }
                 outputStream.flush()
                 return true
@@ -115,6 +121,22 @@ class AudioRecord{
 
     companion object{
         private const val TAG_AUDIO="AudioRecord"
+    }
+
+    @Throws(IOException::class)
+    private fun convertIntToByteArray(i: Int): ByteArray? {
+        val bos = ByteArrayOutputStream()
+        val dos = DataOutputStream(bos)
+        dos.writeInt(i)
+        dos.flush()
+        return bos.toByteArray()
+    }
+
+    private fun convertIntArrayToByteArray(data: Array<Int>?): ByteArray? {
+        if (data == null) return null
+        val byts = ByteArray(data.size * 4)
+        for (i in data.indices) System.arraycopy(convertIntToByteArray(data[i]), 0, byts, i * 4, 4)
+        return byts
     }
 
 }

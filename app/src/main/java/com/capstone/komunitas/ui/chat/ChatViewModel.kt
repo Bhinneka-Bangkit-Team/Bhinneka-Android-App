@@ -2,6 +2,7 @@ package com.capstone.komunitas.ui.chat
 
 import android.util.Log
 import androidx.camera.core.CameraSelector
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.capstone.komunitas.data.repositories.ChatRepository
 import com.capstone.komunitas.engines.AudioRecord
@@ -99,25 +100,40 @@ class ChatViewModel(
 
     fun sendAudio(body:MultipartBody.Part,lang:RequestBody){
 
-
-
         Coroutines.main {
             try {
                 val responseTTS = repository.sendAudio(body,lang)
                 Log.d("AudioRecord", "sendAudio: $responseTTS" )
-//                responseTTS?.let {
-//                    if (it.data?.length!! > 0){
-////                        speechChat(newMessageText!!)
-////                        repository.saveChat(it.data)
-//                        chatListener?.onSendSuccess("Berhasil mengambil audio pesan")
-//                        newMessageText = null
-//                        return@main
-//                    }
-//                }
+                responseTTS?.let {
+
+                    if(it.data?.length!! > 0){
+                        chatListener?.onSendSuccess("Berhasil mengambil audio pesan ${it.data}")
+                        newMessageText = "etsti"
+                        sendMessagePressed()
+                        return@main
+                    }
+                }
             }catch (e: ApiException){
                 Log.e("AudioRecord", "sendAudio: $e" )
             }catch (e:NoInternetException){
                 Log.e("AudioRecord", "sendAudio: $e" )
+            }
+        }
+    }
+     fun downloadAudio(){
+        Coroutines.main {
+            try {
+                val responseSTT = repository.downloadAudio(newMessageText.toString())
+                responseSTT?.let {
+                    if (it.statusCode?.equals(200) == true){
+                        audioRecord.saveIntoAudio(it)
+                        chatListener?.onSendSuccess("Berhasil mengambil audio pesan : ${it.message}")
+                    }
+                }
+            }catch (e:ApiException){
+                Log.e("AudioRecord", "downloadAudio: $e" )
+            }catch (e:NoInternetException){
+                Log.e("AudioRecord", "downloadAudio: $e" )
             }
         }
     }
