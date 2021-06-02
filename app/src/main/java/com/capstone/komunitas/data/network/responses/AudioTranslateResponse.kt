@@ -1,6 +1,7 @@
 package com.capstone.komunitas.data.network.responses
 
 import java.nio.Buffer
+import java.nio.ByteBuffer
 
 class AudioTranslateResponse (
     val statusCode: Int? = null,

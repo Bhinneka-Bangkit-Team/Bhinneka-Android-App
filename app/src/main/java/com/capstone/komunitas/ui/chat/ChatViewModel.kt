@@ -57,7 +57,7 @@ class ChatViewModel(
         }else{
             audioRecord.stopRecording()
             val requestBody = RequestBody.create(MediaType.parse("audio/*"),audioRecord.uploadFile())
-            val lang = RequestBody.create(MediaType.parse("text/plain"),"en-US")
+            val lang = RequestBody.create(MediaType.parse("text/plain"),"id-ID")
             val body = MultipartBody.Part.createFormData("file",audioRecord.uploadFile().name,requestBody)
             sendAudio(body,lang)
 
