@@ -13,7 +13,7 @@
         android:id="@+id/root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="?attr/colorOnPrimary"
         tools:context=".ui.auth.LoginActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -54,6 +54,7 @@
                 android:layout_height="40dp"
                 android:layout_marginTop="40dp"
                 android:background="@drawable/rectangle_border_blue"
+                android:backgroundTint="?attr/colorOnPrimary"
                 android:hint="  Email"
                 android:maxLines="1"
                 android:text="@={viewmodel.email}"
@@ -77,6 +78,7 @@
                 android:layout_height="40dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/rectangle_border_blue"
+                android:backgroundTint="?attr/colorOnPrimary"
                 android:hint="  Kata Sandi"
                 android:maxLines="1"
                 android:text="@={viewmodel.password}"
@@ -135,7 +137,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Belum punya akun?"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorAccent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/btn_daftar1"

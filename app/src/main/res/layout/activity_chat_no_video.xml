@@ -13,7 +13,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="?attr/colorOnPrimary"
         tools:context=".ui.auth.LoginActivity">
 
 
@@ -53,7 +53,7 @@
                 android:id="@+id/layoutChatbox"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:background="@android:color/white"
+                android:background="?attr/colorOnPrimary"
                 android:minHeight="48dp"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toTopOf="@+id/layout_control_novid"
@@ -71,10 +71,23 @@
                     android:layout_weight=".2"
                     android:background="@drawable/rectangle_border_secondary"
                     android:hint="Ketik pesan"
+                    android:backgroundTint="?attr/colorOnPrimary"
                     android:importantForAutofill="no"
                     android:inputType="text"
                     android:maxLines="6"
                     android:text="@={viewmodel.newMessageText}" />
+<!--                <Button-->
+<!--                    android:id="@+id/testAudio"-->
+<!--                    android:paddingHorizontal="10dp"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_marginEnd="10dp"-->
+<!--                    android:layout_marginVertical="5dp"-->
+<!--                    android:layout_weight=".6"-->
+<!--                    android:clickable="true"-->
+<!--                    android:onClick="@{() -> viewmodel.downloadAudio()}"-->
+<!--                    android:text="aud"-->
+<!--                    android:textSize="14sp" />-->
 
                 <ImageButton
                     android:id="@+id/sendBtn"
@@ -97,7 +110,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:gravity="center"
-                android:background="@color/white"
+                android:background="?attr/colorOnPrimary"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
@@ -136,10 +149,19 @@
                     app:navigationIcon="@drawable/ic_arrow_back"
                     android:backgroundTint="@color/white"
                     style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
+          <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/chat_no_vid_appbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:title="Tuliskan Percakapan"
+                app:titleCentered="true"
+                app:titleTextColor="@color/blue"
+                app:navigationIcon="@drawable/ic_arrow_back"
+                android:backgroundTint="?attr/colorOnPrimary"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
 
-            </com.google.android.material.appbar.AppBarLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.appbar.AppBarLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 
         <ProgressBar
             android:id="@+id/progress_bar_chat_novideo"

@@ -80,6 +80,7 @@
                     android:layout_marginVertical="10dp"
                     android:layout_weight=".2"
                     android:background="@drawable/rectangle_border_secondary"
+                    android:backgroundTint="?attr/colorOnPrimary"
                     android:hint="Ketik pesan"
                     android:importantForAutofill="no"
                     android:inputType="text"
@@ -107,7 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:gravity="center"
-                android:background="@color/white"
+                android:background="?attr/colorOnPrimary"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">

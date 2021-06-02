@@ -19,5 +19,6 @@ class ChatReceivedItem(
 
     override fun bind(viewBinding: ListItemMessageReceivedBinding, position: Int) {
         viewBinding.message = chat
+
     }
 }

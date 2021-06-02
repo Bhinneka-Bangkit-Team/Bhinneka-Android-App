@@ -1,6 +1,10 @@
 package com.capstone.komunitas.ui.chat
 
+import android.content.pm.PackageManager
+import android.media.MediaRecorder
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.ViewTreeObserver
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -10,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.capstone.komunitas.R
 import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.databinding.ActivityChatNoVideoBinding
+import com.capstone.komunitas.engines.AudioRecord
 import com.capstone.komunitas.util.*
 import com.google.mediapipe.components.PermissionHelper
 import com.xwray.groupie.GroupieAdapter
@@ -19,6 +24,8 @@ import kotlinx.android.synthetic.main.activity_chat_with_video.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
+import java.io.*
+import java.lang.Exception
 
 
 class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
@@ -57,6 +64,7 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         chat_no_vid_appbar.setNavigationOnClickListener {
             onBack()
         }
+
     }
 
     private fun bindUI(viewModel: ChatViewModel) = Coroutines.main {
@@ -128,8 +136,34 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     override fun onRecordPressed(isRecording: Boolean) {
         if(isRecording){
             btnrecord_chat_novid.setImageResource(R.drawable.ic_stop_white)
+
         }else{
             btnrecord_chat_novid.setImageResource(R.drawable.ic_record_white)
+
         }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when(requestCode){
+            1 -> {
+                if(grantResults.size > 0){
+                    var permissionToRecord = grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    var permissionToStore = grantResults[1] == PackageManager.PERMISSION_GRANTED
+
+                }
+            }
+        }
+    }
+
+
+
+
+    companion object{
+        private const val TAG_AUDIO="AudioRecord"
     }
 }

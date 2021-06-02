@@ -1,5 +1,6 @@
 package com.capstone.komunitas.data.repositories
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.capstone.komunitas.data.db.AppDatabase
@@ -7,10 +8,16 @@ import com.capstone.komunitas.data.db.PreferenceProvider
 import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.data.network.BackendApi
 import com.capstone.komunitas.data.network.SafeApiRequest
+import com.capstone.komunitas.data.network.responses.AudioResponse
+import com.capstone.komunitas.data.network.responses.AudioTranslateResponse
 import com.capstone.komunitas.data.network.responses.ChatResponse
 import com.capstone.komunitas.util.Coroutines
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -75,6 +82,25 @@ class ChatRepository(
             db.getChatDao().saveAllChat(chats)
         }
     }
+
+    suspend fun sendAudio(multi: MultipartBody.Part,lang:RequestBody): AudioResponse {
+        val token = "Bearer "+prefs.getAuthToken()
+        return apiRequest {
+            api.sendAudio(token,multi,lang)
+        }
+    }
+
+    suspend fun downloadAudio(text:String):AudioTranslateResponse{
+
+        return withContext(Dispatchers.IO){
+            apiRequest {
+                api.getAudio("Bearer "+prefs.getAuthToken(),text,"id-ID")
+            }
+        }
+    }
+
+
+
 
     suspend fun deleteChats() = db.getChatDao().deleteChats()
 }

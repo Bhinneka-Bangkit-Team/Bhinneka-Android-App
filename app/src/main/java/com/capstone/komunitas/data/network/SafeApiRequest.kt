@@ -1,5 +1,6 @@
 package com.capstone.komunitas.data.network
 
+import android.util.Log
 import com.capstone.komunitas.util.ApiException
 import org.json.JSONException
 import org.json.JSONObject
@@ -18,8 +19,13 @@ abstract class SafeApiRequest {
             error?.let{
                 try{
                     message.append(JSONObject(it).get("message"))
-                }catch(e: JSONException){}
-                message.append(JSONObject(it).get("\n"))
+                    Log.e("SafeApiRequest", "apiRequest: $it" )
+                    message.append(JSONObject(it).get("\n"))
+                }catch(e: JSONException){
+                    Log.e("SafeApiRequest", "apiRequest: $e" )
+
+                }
+
             }
             message.append("Error Code: ${response.code()}")
             throw ApiException(message.toString())

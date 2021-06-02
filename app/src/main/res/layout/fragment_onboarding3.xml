@@ -5,7 +5,7 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="?attr/colorOnPrimary"
     tools:context=".ui.onboarding.Onboarding3Fragment">
 
     <ImageView
@@ -37,7 +37,7 @@
             android:layout_marginBottom="10dp"
             android:gravity="center"
             android:text="Komunikasi Lebih Mudah"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorAccent"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -47,7 +47,7 @@
             android:layout_marginBottom="100dp"
             android:gravity="center"
             android:text="Bebas memilih metode komunikasi dan mengobrol dengan setiap orang tanpa hambatan"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorAccent"
             android:textSize="18sp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

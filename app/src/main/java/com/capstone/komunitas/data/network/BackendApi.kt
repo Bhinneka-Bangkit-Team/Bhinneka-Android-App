@@ -1,14 +1,19 @@
 package com.capstone.komunitas.data.network
 
+import com.capstone.komunitas.data.network.responses.AudioResponse
+import com.capstone.komunitas.data.network.responses.AudioTranslateResponse
 import com.capstone.komunitas.data.network.responses.AuthResponse
 import com.capstone.komunitas.data.network.responses.ChatResponse
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
+import java.io.File
 
 interface BackendApi {
     @FormUrlEncoded
@@ -40,6 +45,24 @@ interface BackendApi {
         @Field("isSpeaker") isSpeaker: Int,
         @Field("lang") lang: String
     ): Response<ChatResponse>
+
+
+
+    @Multipart
+    @POST("google/stt")
+    suspend fun sendAudio(
+    @Header("Authorization") accessToken: String,
+    @Part file: MultipartBody.Part,
+    @Part("lang") lang: RequestBody
+    ):Response<AudioResponse>
+
+    @FormUrlEncoded
+    @POST("google/tts")
+    suspend fun getAudio(
+        @Header("Authorization") accessToken: String,
+        @Field("text") text: String,
+        @Field("lang") lang: String
+    ):Response<AudioTranslateResponse>
 
     companion object {
         operator fun invoke(
