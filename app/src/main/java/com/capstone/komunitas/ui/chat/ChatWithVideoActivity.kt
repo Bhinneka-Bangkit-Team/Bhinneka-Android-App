@@ -1,6 +1,8 @@
 package com.capstone.komunitas.ui.chat
 
 import android.content.res.AssetFileDescriptor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.util.Log
@@ -9,7 +11,6 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -21,10 +22,7 @@ import com.capstone.komunitas.databinding.ActivityChatWithVideoBinding
 import com.capstone.komunitas.util.*
 import com.google.mediapipe.components.*
 import com.google.mediapipe.formats.proto.LandmarkProto
-import com.google.mediapipe.framework.AndroidAssetUtil
-import com.google.mediapipe.framework.AndroidPacketCreator
-import com.google.mediapipe.framework.Packet
-import com.google.mediapipe.framework.PacketGetter
+import com.google.mediapipe.framework.*
 import com.google.mediapipe.glutil.EglManager
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.android.synthetic.main.activity_chat_no_video.progress_bar_chat_novideo
@@ -32,8 +30,16 @@ import kotlinx.android.synthetic.main.activity_chat_with_video.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
+import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
+import org.tensorflow.lite.support.common.TensorProcessor
+import org.tensorflow.lite.support.common.ops.NormalizeOp
+import org.tensorflow.lite.support.image.ImageProcessor
+import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.support.image.ops.ResizeOp
+import org.tensorflow.lite.support.label.TensorLabel
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -52,7 +58,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
 
     companion object {
         private val TAG = "MainActivity"
-        private val BINARY_GRAPH_NAME = "hand_tracking_mobile_gpu.binarypb"
+        private val BINARY_GRAPH_NAME = "hand_tracking_mobile_gpu_old.binarypb"
         private val INPUT_VIDEO_STREAM_NAME = "input_video"
         private val OUTPUT_VIDEO_STREAM_NAME = "output_video"
         private val OUTPUT_LANDMARKS_STREAM_NAME = "hand_landmarks"
@@ -74,7 +80,6 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         .apply { order(nativeOrder()) }
     val ASSOCIATED_AXIS_LABELS = "sign_language_v1.txt"
     var associatedAxisLabels: List<String>? = null
-
 
     // MediaPipe things
     private var lensFacing: CameraHelper.CameraFacing = CameraHelper.CameraFacing.FRONT
@@ -136,6 +141,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         processor!!
             .getVideoSurfaceOutput()
             .setFlipY(FLIP_FRAMES_VERTICALLY)
+        PermissionHelper.checkAndRequestAudioPermissions(this)
         PermissionHelper.checkAndRequestCameraPermissions(this)
         val packetCreator: AndroidPacketCreator = processor!!.getPacketCreator()
         val inputSidePackets: MutableMap<String, Packet> = HashMap<String, Packet>()
@@ -152,7 +158,83 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
                     LandmarkProto.NormalizedLandmarkList.parser()
                 )
             inferenceHandLandmarks(multiHandLandmarks)
+//            var image = AndroidPacketGetter.getBitmapFromRgba(packet)
+//            inferenceImageLandmarks(image, multiHandLandmarks)
         }
+    }
+
+    // Check confidence by threshold
+    // Ambil label yang paling banyak muncul (by timing or by frames)
+    //
+
+    private fun getLandmarkCenter(landmarks: LandmarkProto.NormalizedLandmarkList): List<Float> {
+        var xmax: Float = 0F
+        var ymax: Float = 0F
+        var xmin: Float = 0F
+        var ymin: Float = 0F
+
+        var landmarkIndex = 0
+        var xcur: Float
+        var ycur: Float
+        for (landmark: LandmarkProto.NormalizedLandmark in landmarks.getLandmarkList()) {
+            xcur = landmark.getX()
+            ycur = landmark.getY()
+
+            if(xcur > xmax)
+                xmax = xcur
+            if(ycur > ymax)
+                ymax = ycur
+            if(xcur < xmin)
+                xmin = xcur
+            if(ycur < ymin)
+                ymin = ycur
+            ++landmarkIndex
+        }
+
+        xcur = xmin + (xmax - xmin)/2
+        ycur = ymin + (ymax - ymin)/2
+        val result: List<Float> = listOf(xcur, ycur, xmax, ymax, xmin, ymin)
+
+        return result
+    }
+
+    private fun inferenceImageLandmarks(imageInput: Bitmap, multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>) {
+        if (multiHandLandmarks.isEmpty()) {
+            return
+        }
+
+        var handIndex = 0
+        for (landmarks: LandmarkProto.NormalizedLandmarkList in multiHandLandmarks) {
+            var resultList: MutableList<Float> = ArrayList()
+            var centerValues = getLandmarkCenter(landmarks)
+
+            var resizedImage = Bitmap.createBitmap(imageInput, centerValues[0].toInt(), centerValues[1].toInt(), centerValues[2].toInt(), centerValues[3].toInt())
+            inferenceImageHand(resizedImage)
+            ++handIndex
+        }
+    }
+
+    private fun inferenceImageHand(imageInput: Bitmap) {
+        val imageProcessor = ImageProcessor.Builder()
+            .add(ResizeOp(150, 150, ResizeOp.ResizeMethod.BILINEAR))
+            .build()
+
+        var tensorImage = TensorImage(DataType.UINT8)
+
+        tensorImage.load(imageInput)
+        tensorImage = imageProcessor.process(tensorImage)
+
+        val probabilityBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 1001), DataType.UINT8)
+        tfliteInterpreter.run(tensorImage.buffer, probabilityBuffer)
+
+        val probabilityProcessor = TensorProcessor.Builder().add(NormalizeOp(0F, 255F)).build()
+
+        val labels = TensorLabel(
+            associatedAxisLabels!!,
+            probabilityProcessor.process(probabilityBuffer)
+        )
+
+        val floatMap = labels.mapWithFloatValue
     }
 
     private fun inferenceHandLandmarks(multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>) {
@@ -164,13 +246,16 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         var handIndex = 0
         for (landmarks: LandmarkProto.NormalizedLandmarkList in multiHandLandmarks) {
             var resultList: MutableList<Float> = ArrayList()
+            var centerValues = getLandmarkCenter(landmarks)
 
             var landmarkIndex = 0
             for (landmark: LandmarkProto.NormalizedLandmark in landmarks.getLandmarkList()) {
-                resultList.add(landmark.getX())
-                resultList.add(landmark.getY())
+                resultList.add(landmark.getX()-centerValues[0])
+                resultList.add(landmark.getY()-centerValues[1])
                 ++landmarkIndex
             }
+            Log.d("resultList", resultList.toString())
+            Log.d("resultList size", resultList.size.toString())
 
 //            val probabilityBuffer =
 //                TensorBuffer.createFixedSize(intArrayOf(1, 1001), DataType.UINT8)
@@ -182,9 +267,17 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             resultList.unwindToByteBuffer(tfliteInputBuffer)
             tfliteInterpreter.run(tfliteInputBuffer, outputArray)
             var labelResult = getTopLabel(outputArray[0])
+            Log.d("labelResult", labelResult.toString())
             val (label, likelihood) = labelResult[0]
             this.runOnUiThread {
-                tv_preview_isyarat.text = label
+                if(label.length==1){
+                    tv_preview_isyarat.text = tv_preview_isyarat.text.toString().plus(label)
+                }else{
+                    tv_preview_isyarat.text = tv_preview_isyarat.text.toString().plus(" ").plus(label)
+                }
+                if(tv_preview_isyarat.text.length > 100){
+                    tv_preview_isyarat.text = label
+                }
             }
             ++handIndex
         }
@@ -197,6 +290,8 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         output.forEachIndexed { index, fl ->
             val prediction = associatedAxisLabels?.get(index).toString() to fl
             val (currentLabel, currentLikelihood) = prediction
+//            Log.d("currentLabel", currentLabel.toString())
+//            Log.d("prediction", prediction.toString())
 
             if (predictions.size < 10) {
                 predictions.add(prediction)
@@ -305,6 +400,28 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         )
     }
 
+//    fun bindCamera(lensFacing: Int) {
+//        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+//        cameraProviderFuture.addListener(Runnable {
+//            val cameraProvider = cameraProviderFuture.get()
+//            cameraProvider.unbindAll()
+//            bindPreview(cameraProvider, lensFacing)
+//        }, ContextCompat.getMainExecutor(this))
+//    }
+//
+//    fun bindPreview(cameraProvider: ProcessCameraProvider, lensFacing: Int) {
+//        val preview: Preview = Preview.Builder()
+//            .build()
+//
+//        val cameraSelector: CameraSelector = CameraSelector.Builder()
+//            .requireLensFacing(lensFacing)
+//            .build()
+//
+//        preview.setSurfaceProvider(previewView.getSurfaceProvider())
+//
+//        var camera = cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, preview)
+//    }
+
     protected fun computeViewSize(width: Int, height: Int): Size {
         return Size(width, height)
     }
@@ -408,28 +525,6 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             }
         }
     }
-
-//    fun bindCamera(lensFacing: Int) {
-//        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-//        cameraProviderFuture.addListener(Runnable {
-//            val cameraProvider = cameraProviderFuture.get()
-//            cameraProvider.unbindAll()
-//            bindPreview(cameraProvider, lensFacing)
-//        }, ContextCompat.getMainExecutor(this))
-//    }
-//
-//    fun bindPreview(cameraProvider: ProcessCameraProvider, lensFacing: Int) {
-//        val preview: Preview = Preview.Builder()
-//            .build()
-//
-//        val cameraSelector: CameraSelector = CameraSelector.Builder()
-//            .requireLensFacing(lensFacing)
-//            .build()
-//
-//        preview.setSurfaceProvider(previewView.getSurfaceProvider())
-//
-//        var camera = cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, preview)
-//    }
 
     private fun bindUI(viewModel: ChatViewModel) = Coroutines.main {
         progress_bar_chat_novideo.show()
