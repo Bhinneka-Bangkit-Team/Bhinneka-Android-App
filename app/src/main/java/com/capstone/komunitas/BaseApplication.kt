@@ -1,6 +1,7 @@
 package com.capstone.komunitas
 
 import android.app.Application
+import android.content.Context
 import com.capstone.komunitas.data.db.AppDatabase
 import com.capstone.komunitas.data.db.PreferenceProvider
 import com.capstone.komunitas.data.network.BackendApi
@@ -34,7 +35,9 @@ class BaseApplication: Application(), KodeinAware {
         bind() from this.provider { SplashScreenViewModelFactory(this.instance()) }
         bind() from this.provider { AuthViewModelFactory(this.instance()) }
         bind() from this.provider { HomeViewModelFactory(this.instance(), this.instance()) }
-        bind() from this.provider { ChatViewModelFactory(this.instance(), this.instance()) }
+        bind() from this.provider { ChatViewModelFactory(this.instance(), this.instance(),
+            context as Context
+        ) }
 
     }
 }
