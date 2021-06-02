@@ -1,18 +1,19 @@
 package com.capstone.komunitas.engines
 
+import android.content.Context
 import android.media.MediaRecorder
 import android.os.Environment
 import android.util.Log
 import com.capstone.komunitas.data.network.responses.AudioTranslateResponse
 import java.io.*
 
-class AudioRecord{
+class AudioRecord(private val context: Context){
     private lateinit var recorder:MediaRecorder
     private lateinit var fileOutput:String
 
      fun startRecording(){
         recorder = MediaRecorder()
-        fileOutput = Environment.getExternalStorageDirectory().absolutePath+"/recording.3gp"
+        fileOutput = context.filesDir.absolutePath+"/recording.3gp"
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
         recorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB)
@@ -80,15 +81,12 @@ class AudioRecord{
 
             try {
                 val fileReader = ByteArray(1024)
-                val responseAudioIntArray = responseBody.data?.data
+                val responseAudioIntArray = responseBody.data
 
                 var fileSizeDownloaded = 0
-               
-                val byte = ByteArrayInputStream(responseAudioIntArray?.remaining()?.let {
-                    ByteArray(
-                        it
-                    )
-                })
+                val arr = responseAudioIntArray?.remaining()?.let { ByteArray(it) }
+                responseAudioIntArray?.get(arr)
+                val byte = ByteArrayInputStream(arr)
                  inputStream = BufferedInputStream(byte)
                 outputStream = FileOutputStream(finalFile)
                 while (true){

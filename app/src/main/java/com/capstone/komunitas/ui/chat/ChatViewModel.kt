@@ -1,5 +1,7 @@
 package com.capstone.komunitas.ui.chat
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.lifecycle.LiveData
@@ -20,13 +22,14 @@ import kotlin.coroutines.coroutineContext
 
 class ChatViewModel(
     private val repository: ChatRepository,
-    private val textToSpeechEngine: TextToSpeechEngine
+    private val textToSpeechEngine: TextToSpeechEngine,
+    @SuppressLint("StaticFieldLeak") private val context: Context
 ) : ViewModel() {
     var chatListener: ChatListener? = null
     var newMessageText: String? = null
     var isRecording: Boolean = false
     var lensFacing = CameraSelector.LENS_FACING_BACK
-    val audioRecord = AudioRecord()
+    val audioRecord = AudioRecord(context)
 
     val chats by lazyDeferred {
         repository.getChat()
@@ -56,6 +59,7 @@ class ChatViewModel(
             audioRecord.startRecording()
         }else{
             audioRecord.stopRecording()
+            Log.d("audioRecord", "onRecordPressed: "+audioRecord.uploadFile())
             val requestBody = RequestBody.create(MediaType.parse("audio/*"),audioRecord.uploadFile())
             val lang = RequestBody.create(MediaType.parse("text/plain"),"id-ID")
             val body = MultipartBody.Part.createFormData("file",audioRecord.uploadFile().name,requestBody)

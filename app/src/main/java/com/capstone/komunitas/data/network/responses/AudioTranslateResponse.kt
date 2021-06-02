@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 class AudioTranslateResponse (
     val statusCode: Int? = null,
     val message: String? = null,
-    val data: dataBuffer? = null,
+    val data: ByteBuffer? = null,
     val error: String? = null
         )
 
