@@ -2,7 +2,6 @@ package com.capstone.komunitas.ui.chat
 
 import android.content.res.AssetFileDescriptor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.util.Log
@@ -40,7 +39,9 @@ import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.label.TensorLabel
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder.nativeOrder
@@ -162,9 +163,12 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             }
         }
         processor!!.addPacketCallback(
-            "transformed_image_cpu"
-        ) { packet ->
-            println("Received image with ts: ${packet.timestamp}")
+            "throttled_input_video_cpu"
+        ) { packet: Packet ->
+            Log.v(
+                TAG,
+                "Received input_image_cpu packet."
+            )
             mpImageBitmap = AndroidPacketGetter.getBitmapFromRgba(packet)
         }
     }
