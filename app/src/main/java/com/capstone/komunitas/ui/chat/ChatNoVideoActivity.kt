@@ -16,6 +16,7 @@ import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.databinding.ActivityChatNoVideoBinding
 import com.capstone.komunitas.engines.AudioRecord
 import com.capstone.komunitas.util.*
+import com.google.mediapipe.components.PermissionHelper
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.android.synthetic.main.activity_chat_no_video.*
 import kotlinx.android.synthetic.main.activity_chat_no_video.progress_bar_chat_novideo
@@ -41,6 +42,7 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         val viewModel = ViewModelProviders.of(this, factory).get(ChatViewModel::class.java)
         binding.viewmodel = viewModel
 
+        PermissionHelper.checkAndRequestAudioPermissions(this)
         viewModel.chatListener = this
         bindUI(viewModel)
         bindAppBar()
