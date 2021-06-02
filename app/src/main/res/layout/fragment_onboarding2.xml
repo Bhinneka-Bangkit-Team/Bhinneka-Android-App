@@ -5,7 +5,7 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="?attr/colorOnPrimary"
     tools:context=".ui.onboarding.Onboarding2Fragment">
 
     <ImageView
@@ -38,7 +38,7 @@
             android:layout_marginBottom="10dp"
             android:gravity="center"
             android:text="Konversi Suara dan Text"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSecondary"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -48,7 +48,7 @@
             android:layout_marginBottom="100dp"
             android:gravity="center"
             android:text="Tulis pesan dan dikonversi menjadi suara atau rekam obrolan dan konversi menjadi text"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSecondary"
             android:textSize="18sp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

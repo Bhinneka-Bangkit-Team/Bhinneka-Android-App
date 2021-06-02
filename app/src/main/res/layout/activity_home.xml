@@ -14,7 +14,7 @@
         android:id="@+id/root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="?attr/colorOnPrimary"
         tools:context=".ui.home.HomeActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,7 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Pilihlah metode yang sesuai dengan kebutuhanmu agar dapat berkomunikasi dengan lebih mudah dan tanpa hambatan"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnSecondary"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -98,7 +98,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Lisan"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/colorAccent"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -106,11 +106,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Ketik kalimat yang ingn kamu katakan kemudian ubah menjadi bentuk suara"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/colorAccent"
                             android:textSize="14sp" />
                     </LinearLayout>
 
                     <ImageView
+                        android:layout_margin="5dp"
                         android:layout_width="80dp"
                         android:layout_height="match_parent"
                         android:src="@drawable/lisan" />
@@ -146,7 +147,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Isyarat"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/colorAccent"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -154,11 +155,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Visualisasikan gerakan bahasa isyarat kemudian ubah menjadi bentuk tulisan"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/colorAccent"
                             android:textSize="14sp" />
                     </LinearLayout>
 
                     <ImageView
+                        android:layout_margin="5dp"
                         android:layout_width="80dp"
                         android:layout_height="match_parent"
                         android:src="@drawable/isyarat" />
@@ -194,7 +196,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="MediaPipe Test"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/colorAccent"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -202,11 +204,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Untuk kepeluan pengembangan saja. Test activity MediaPipe hands"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/colorAccent"
                             android:textSize="14sp" />
                     </LinearLayout>
 
                     <ImageView
+                        android:layout_margin="5dp"
                         android:layout_width="80dp"
                         android:layout_height="match_parent"
                         android:src="@drawable/logo_project" />

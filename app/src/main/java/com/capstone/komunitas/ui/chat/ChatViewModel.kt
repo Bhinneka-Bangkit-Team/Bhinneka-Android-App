@@ -99,20 +99,21 @@ class ChatViewModel(
     }
 
     fun sendAudio(body:MultipartBody.Part,lang:RequestBody){
-
+        chatListener?.onSendStarted()
         Coroutines.main {
             try {
                 val responseTTS = repository.sendAudio(body,lang)
-                Log.d("AudioRecord", "sendAudio: $responseTTS" )
+                Log.d("AudioRecord", "sendAudio: ${responseTTS.message}" )
                 responseTTS?.let {
 
-                    if(it.data?.length!! > 0){
+                    if (it.statusCode?.equals(200) == true){
                         chatListener?.onSendSuccess("Berhasil mengambil audio pesan ${it.data}")
-                        newMessageText = "etsti"
+                        newMessageText = it.data
                         sendMessagePressed()
                         return@main
                     }
                 }
+                chatListener?.onSendFailure("Terjadi kesalahan")
             }catch (e: ApiException){
                 Log.e("AudioRecord", "sendAudio: $e" )
             }catch (e:NoInternetException){
@@ -120,10 +121,11 @@ class ChatViewModel(
             }
         }
     }
-     fun downloadAudio(){
+     fun downloadAudio(text: String?){
         Coroutines.main {
             try {
-                val responseSTT = repository.downloadAudio(newMessageText.toString())
+                val responseSTT = repository.downloadAudio("test")
+                Log.d("AudioRecord", "sendAudio: ${responseSTT.message}" )
                 responseSTT?.let {
                     if (it.statusCode?.equals(200) == true){
                         audioRecord.saveIntoAudio(it)

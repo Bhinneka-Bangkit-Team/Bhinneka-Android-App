@@ -47,17 +47,10 @@ interface BackendApi {
     ): Response<ChatResponse>
 
 
-    @FormUrlEncoded
-    @POST("google/stt")
-    suspend fun sendAudio(
-    @Header("Authorization") accessToken: String,
-    @Field("file") file: File,
-    @Field("lang") lang: String
-    ):Response<AudioResponse>
 
     @Multipart
     @POST("google/stt")
-    suspend fun sendAudioTest(
+    suspend fun sendAudio(
     @Header("Authorization") accessToken: String,
     @Part file: MultipartBody.Part,
     @Part("lang") lang: RequestBody

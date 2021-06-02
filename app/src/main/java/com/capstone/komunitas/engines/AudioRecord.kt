@@ -83,6 +83,7 @@ class AudioRecord{
                 val responseAudioIntArray = responseBody.data?.data
 
                 var fileSizeDownloaded = 0
+               
                 val byte = ByteArrayInputStream(responseAudioIntArray?.remaining()?.let {
                     ByteArray(
                         it
