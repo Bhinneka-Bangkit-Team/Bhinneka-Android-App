@@ -21,8 +21,15 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:orientation="vertical">
-
+        android:orientation="horizontal"
+        android:gravity="right">
+        <ImageButton
+            android:backgroundTint="?attr/colorOnPrimary"
+            android:src="@drawable/ic_baseline_volume_up_24"
+            android:id="@+id/mic_chat"
+            android:layout_width="wrap_content"
+            android:onClick="@{() -> viewmodel.downloadAudio(message.text)}"
+            android:layout_height="wrap_content"/>
         <TextView
             android:paddingVertical="15dp"
             android:paddingHorizontal="20dp"
@@ -42,5 +49,6 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             tools:text="This is a message This is a message This is a message This is a message This is a message This is a message This is a message This is a message " />
+
     </LinearLayout>
 </layout>

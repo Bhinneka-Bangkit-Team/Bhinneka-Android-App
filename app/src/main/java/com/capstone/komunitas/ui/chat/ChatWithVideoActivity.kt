@@ -56,9 +56,10 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     override val kodein by kodein()
     private val factory: ChatViewModelFactory by instance()
 
+    // MediaPipe things
     companion object {
         private val TAG = "MainActivity"
-        private val BINARY_GRAPH_NAME = "hand_tracking_mobile_gpu_old.binarypb"
+        private val BINARY_GRAPH_NAME = "hand_tracking_mobile_gpu.binarypb"
         private val INPUT_VIDEO_STREAM_NAME = "input_video"
         private val OUTPUT_VIDEO_STREAM_NAME = "output_video"
         private val OUTPUT_LANDMARKS_STREAM_NAME = "hand_landmarks"
@@ -71,6 +72,15 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             System.loadLibrary("opencv_java3")
         }
     }
+    private var lensFacing: CameraHelper.CameraFacing = CameraHelper.CameraFacing.FRONT
+    private var isSurfaceAttached: Boolean = false
+    private var previewFrameTexture: SurfaceTexture? = null
+    private var previewDisplayView: SurfaceView? = null
+    private var eglManager: EglManager? = null
+    private var processor: FrameProcessor? = null
+    private var converter: ExternalTextureConverter? = null
+    private var cameraHelper: CameraXPreviewHelper? = null
+    private var mpImageBitmap: Bitmap? = null
 
     // TFLite things
     val tfliteInterpreter by lazy {
@@ -80,16 +90,6 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         .apply { order(nativeOrder()) }
     val ASSOCIATED_AXIS_LABELS = "sign_language_v1.txt"
     var associatedAxisLabels: List<String>? = null
-
-    // MediaPipe things
-    private var lensFacing: CameraHelper.CameraFacing = CameraHelper.CameraFacing.FRONT
-    private var isSurfaceAttached: Boolean = false
-    private var previewFrameTexture: SurfaceTexture? = null
-    private var previewDisplayView: SurfaceView? = null
-    private var eglManager: EglManager? = null
-    private var processor: FrameProcessor? = null
-    private var converter: ExternalTextureConverter? = null
-    private var cameraHelper: CameraXPreviewHelper? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,7 +103,6 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         viewModel.chatListener = this
 
         bindUI(viewModel)
-//        bindCamera(viewModel.lensFacing)
         initMediaPipe()
         bindAppBar(viewModel)
     }
@@ -157,45 +156,17 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
                     packet,
                     LandmarkProto.NormalizedLandmarkList.parser()
                 )
-            inferenceHandLandmarks(multiHandLandmarks)
-//            var image = AndroidPacketGetter.getBitmapFromRgba(packet)
-//            inferenceImageLandmarks(image, multiHandLandmarks)
+//            inferenceHandLandmarks(multiHandLandmarks)
+            if(mpImageBitmap!=null){
+                inferenceImageLandmarks(mpImageBitmap!!, multiHandLandmarks)
+            }
         }
-    }
-
-    // Check confidence by threshold
-    // Ambil label yang paling banyak muncul (by timing or by frames)
-    //
-
-    private fun getLandmarkCenter(landmarks: LandmarkProto.NormalizedLandmarkList): List<Float> {
-        var xmax: Float = 0F
-        var ymax: Float = 0F
-        var xmin: Float = 0F
-        var ymin: Float = 0F
-
-        var landmarkIndex = 0
-        var xcur: Float
-        var ycur: Float
-        for (landmark: LandmarkProto.NormalizedLandmark in landmarks.getLandmarkList()) {
-            xcur = landmark.getX()
-            ycur = landmark.getY()
-
-            if(xcur > xmax)
-                xmax = xcur
-            if(ycur > ymax)
-                ymax = ycur
-            if(xcur < xmin)
-                xmin = xcur
-            if(ycur < ymin)
-                ymin = ycur
-            ++landmarkIndex
+        processor!!.addPacketCallback(
+            "transformed_image_cpu"
+        ) { packet ->
+            println("Received image with ts: ${packet.timestamp}")
+            mpImageBitmap = AndroidPacketGetter.getBitmapFromRgba(packet)
         }
-
-        xcur = xmin + (xmax - xmin)/2
-        ycur = ymin + (ymax - ymin)/2
-        val result: List<Float> = listOf(xcur, ycur, xmax, ymax, xmin, ymin)
-
-        return result
     }
 
     private fun inferenceImageLandmarks(imageInput: Bitmap, multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>) {
@@ -206,7 +177,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         var handIndex = 0
         for (landmarks: LandmarkProto.NormalizedLandmarkList in multiHandLandmarks) {
             var resultList: MutableList<Float> = ArrayList()
-            var centerValues = getLandmarkCenter(landmarks)
+            var centerValues = landmarks.getLandmarkCenter()
 
             var resizedImage = Bitmap.createBitmap(imageInput, centerValues[0].toInt(), centerValues[1].toInt(), centerValues[2].toInt(), centerValues[3].toInt())
             inferenceImageHand(resizedImage)
@@ -246,7 +217,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         var handIndex = 0
         for (landmarks: LandmarkProto.NormalizedLandmarkList in multiHandLandmarks) {
             var resultList: MutableList<Float> = ArrayList()
-            var centerValues = getLandmarkCenter(landmarks)
+            var centerValues = landmarks.getLandmarkCenter()
 
             var landmarkIndex = 0
             for (landmark: LandmarkProto.NormalizedLandmark in landmarks.getLandmarkList()) {
@@ -266,8 +237,9 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             val outputArray = arrayOf(FloatArray(36))
             resultList.unwindToByteBuffer(tfliteInputBuffer)
             tfliteInterpreter.run(tfliteInputBuffer, outputArray)
-            var labelResult = getTopLabel(outputArray[0])
+            var labelResult = outputArray[0].getTopLabel(associatedAxisLabels!!)
             Log.d("labelResult", labelResult.toString())
+
             val (label, likelihood) = labelResult[0]
             this.runOnUiThread {
                 if(label.length==1){
@@ -282,77 +254,6 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             ++handIndex
         }
     }
-
-    fun getTopLabel(output: FloatArray): List<Prediction> {
-        // Get top 10 predictions, sorted
-        val predictions = mutableListOf<Prediction>()
-
-        output.forEachIndexed { index, fl ->
-            val prediction = associatedAxisLabels?.get(index).toString() to fl
-            val (currentLabel, currentLikelihood) = prediction
-//            Log.d("currentLabel", currentLabel.toString())
-//            Log.d("prediction", prediction.toString())
-
-            if (predictions.size < 10) {
-                predictions.add(prediction)
-            } else {
-                val shouldReplace = predictions.find {
-                    val (label, likelihood) = it
-                    likelihood < currentLikelihood
-                }
-
-                if (shouldReplace != null) {
-                    predictions[predictions.indexOf(shouldReplace)] = prediction
-                }
-            }
-        }
-
-        return predictions
-    }
-
-//    fun mapOutputToLabels(probabilityBuffer: TensorBuffer) {
-//        val probabilityProcessor = TensorProcessor.Builder().add(NormalizeOp((0).toFloat(), (255).toFloat())).build()
-//
-//        if (null != associatedAxisLabels) {
-//            // Map of labels and their corresponding probability
-//            val labels = TensorLabel(
-//                associatedAxisLabels!!,
-//                probabilityProcessor.process(probabilityBuffer)
-//            )
-//
-//            // Create a map to access the result based on label
-//            val floatMap = labels.mapWithFloatValue
-//        }
-//    }
-
-//    fun getTopPrediction(output: FloatArray): List<Prediction> {
-//        val predictions = mutableListOf<Prediction>()
-//
-//        output.forEachIndexed { index, fl ->
-//            val prediction = (index + 1) to fl
-//            val (currentLabel, currentLikelihood) = prediction
-//
-//            if (predictions.size < 10) {
-//                predictions.add(prediction)
-//            } else {
-//                val shouldReplace = predictions.find {
-//                    val (label, likelihood) = it
-//                    likelihood < currentLikelihood
-//                }
-//
-//                if (shouldReplace != null) {
-//                    predictions[predictions.indexOf(shouldReplace)] = prediction
-//                }
-//            }
-//        }
-//        // log output
-//        predictions.forEachIndexed { index, prediction ->
-//            val (label, likelihood) = prediction
-//            Log.d("TensorFlow Interpreter", "${index + 1}. Prediction: $prediction, Likelihood: $likelihood")
-//        }
-//
-//        return predictions
-//    }
 
     override fun onResume() {
         super.onResume()
@@ -399,28 +300,6 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             this, cameraFacing,  /*unusedSurfaceTexture=*/null, cameraTargetResolution()
         )
     }
-
-//    fun bindCamera(lensFacing: Int) {
-//        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-//        cameraProviderFuture.addListener(Runnable {
-//            val cameraProvider = cameraProviderFuture.get()
-//            cameraProvider.unbindAll()
-//            bindPreview(cameraProvider, lensFacing)
-//        }, ContextCompat.getMainExecutor(this))
-//    }
-//
-//    fun bindPreview(cameraProvider: ProcessCameraProvider, lensFacing: Int) {
-//        val preview: Preview = Preview.Builder()
-//            .build()
-//
-//        val cameraSelector: CameraSelector = CameraSelector.Builder()
-//            .requireLensFacing(lensFacing)
-//            .build()
-//
-//        preview.setSurfaceProvider(previewView.getSurfaceProvider())
-//
-//        var camera = cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, preview)
-//    }
 
     protected fun computeViewSize(width: Int, height: Int): Size {
         return Size(width, height)
@@ -470,44 +349,6 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
                     }
                 })
     }
-
-    private fun getMultiHandLandmarksDebugString(multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>): String {
-        if (multiHandLandmarks.isEmpty()) {
-            return "No hand landmarks"
-        }
-        var multiHandLandmarksStr = "Number of hands detected: " + multiHandLandmarks.size + "\n"
-        var handIndex = 0
-        for (landmarks: LandmarkProto.NormalizedLandmarkList in multiHandLandmarks) {
-            multiHandLandmarksStr += "\t#Hand landmarks for hand[" + handIndex + "]: " + landmarks.getLandmarkCount() + "\n"
-            var landmarkIndex = 0
-            for (landmark: LandmarkProto.NormalizedLandmark in landmarks.getLandmarkList()) {
-                multiHandLandmarksStr += ("\t\tLandmark ["
-                        + landmarkIndex
-                        + "]: ("
-                        + landmark.getX()
-                        + ", "
-                        + landmark.getY()
-                        + ", "
-                        + landmark.getZ()
-                        + ")\n")
-                ++landmarkIndex
-            }
-            ++handIndex
-        }
-        return multiHandLandmarksStr
-    }
-
-    // Keyboard open/close listener
-//    override fun onResume() {
-//        super.onResume()
-//        KeyboardEventListener(this) { isOpen ->
-//            if(isOpen){
-//                layout_control_withvid.hide()
-//            }else{
-//                layout_control_withvid.show()
-//            }
-//        }
-//    }
 
     fun bindAppBar(viewModel: ChatViewModel) {
         // Back listener
@@ -604,5 +445,3 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         }
     }
 }
-
-typealias Prediction = Pair<String, Float>
