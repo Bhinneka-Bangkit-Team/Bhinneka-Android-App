@@ -35,9 +35,7 @@ class BaseApplication: Application(), KodeinAware {
         bind() from this.provider { SplashScreenViewModelFactory(this.instance()) }
         bind() from this.provider { AuthViewModelFactory(this.instance()) }
         bind() from this.provider { HomeViewModelFactory(this.instance(), this.instance()) }
-        bind() from this.provider { ChatViewModelFactory(this.instance(), this.instance(),
-            context as Context
-        ) }
+        bind() from this.provider { ChatViewModelFactory(this.instance(), this.instance(), this.instance()) }
 
     }
 }

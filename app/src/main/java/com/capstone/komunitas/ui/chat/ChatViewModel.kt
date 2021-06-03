@@ -23,12 +23,12 @@ import kotlin.coroutines.coroutineContext
 class ChatViewModel(
     private val repository: ChatRepository,
     private val textToSpeechEngine: TextToSpeechEngine,
-    @SuppressLint("StaticFieldLeak") private val context: Context
+    context: Context
 ) : ViewModel() {
     var chatListener: ChatListener? = null
     var newMessageText: String? = null
     var isRecording: Boolean = false
-    val audioRecord = AudioRecord(context)
+    val audioRecord = AudioRecord(context.applicationContext)
 
     val chats by lazyDeferred {
         repository.getChat()
