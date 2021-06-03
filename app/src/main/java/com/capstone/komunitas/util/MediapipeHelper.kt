@@ -1,5 +1,7 @@
 package com.capstone.komunitas.util
 
+import android.graphics.Bitmap
+import android.util.Size
 import com.google.mediapipe.formats.proto.LandmarkProto
 import org.tensorflow.lite.support.common.TensorProcessor
 import org.tensorflow.lite.support.common.ops.NormalizeOp
@@ -13,8 +15,8 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 fun LandmarkProto.NormalizedLandmarkList.getLandmarkCenter(): List<Float> {
     var xmax: Float = 0F
     var ymax: Float = 0F
-    var xmin: Float = 0F
-    var ymin: Float = 0F
+    var xmin: Float = 999F
+    var ymin: Float = 999F
 
     var landmarkIndex = 0
     var xcur: Float
@@ -36,7 +38,49 @@ fun LandmarkProto.NormalizedLandmarkList.getLandmarkCenter(): List<Float> {
 
     xcur = xmin + (xmax - xmin) / 2
     ycur = ymin + (ymax - ymin) / 2
-    val result: List<Float> = listOf(xcur, ycur, xmax, ymax, xmin, ymin)
+    val result: List<Float> = listOf(xcur, ycur, xmax-xmin, ymax-ymin, xmax, ymax, xmin, ymin)
+
+    return result
+}
+
+fun LandmarkProto.NormalizedLandmarkList.getLandmarkCenterImage(size: Bitmap): List<Float> {
+    var xmax: Float = 0F
+    var ymax: Float = 0F
+    var xmin: Float = 99999F
+    var ymin: Float = 99999F
+
+    var landmarkIndex = 0
+    var xcur: Float
+    var ycur: Float
+    for (landmark: LandmarkProto.NormalizedLandmark in this.getLandmarkList()) {
+        xcur = landmark.getX()*size.width
+        ycur = landmark.getY()*size.height
+        if(xcur > size.width || ycur > size.height){
+            continue
+        }
+
+        if (xcur > xmax)
+            xmax = xcur
+        if (ycur > ymax)
+            ymax = ycur
+        if (xcur < xmin)
+            if(xcur < 0){
+                xmin = 0F
+            }else{
+                xmin = xcur
+            }
+        if (ycur < ymin)
+            if(ycur < 0){
+                ymin = 0F
+            }else{
+                ymin = ycur
+            }
+        ++landmarkIndex
+    }
+
+    xcur = xmin + (xmax - xmin) / 2
+    ycur = ymin + (ymax - ymin) / 2
+    val result: List<Float> = listOf(xcur, ycur, xmax-xmin, ymax-ymin, xmax, ymax, xmin, ymin)
 
     return result
 }

@@ -62,7 +62,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         private val TAG = "MainActivity"
         private val BINARY_GRAPH_NAME = "hand_tracking_mobile_gpu.binarypb"
         private val INPUT_VIDEO_STREAM_NAME = "input_video"
-        private val OUTPUT_VIDEO_STREAM_NAME = "output_video"
+        private val OUTPUT_VIDEO_STREAM_NAME = "throttled_input_video"
         private val OUTPUT_LANDMARKS_STREAM_NAME = "hand_landmarks"
         private val INPUT_NUM_HANDS_SIDE_PACKET_NAME = "num_hands"
         private val NUM_HANDS = 2
@@ -82,6 +82,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     private var converter: ExternalTextureConverter? = null
     private var cameraHelper: CameraXPreviewHelper? = null
     private var mpImageBitmap: Bitmap? = null
+    private var viewSize: Size? = null
 
     // TFLite things
     val tfliteInterpreter by lazy {
@@ -118,7 +119,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
 
     private fun loadModelFile(): MappedByteBuffer {
         loadLabelFile()
-        val fileDescriptor: AssetFileDescriptor = assets.openFd("sign_language_v1.tflite")
+        val fileDescriptor: AssetFileDescriptor = assets.openFd("Final_model_default.tflite")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel: FileChannel = inputStream.channel
         val startOffset: Long = fileDescriptor.startOffset
@@ -177,14 +178,25 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         if (multiHandLandmarks.isEmpty()) {
             return
         }
+        if(viewSize == null){
+            return
+        }
 
         var handIndex = 0
         for (landmarks: LandmarkProto.NormalizedLandmarkList in multiHandLandmarks) {
             var resultList: MutableList<Float> = ArrayList()
-            var centerValues = landmarks.getLandmarkCenter()
-
-            var resizedImage = Bitmap.createBitmap(imageInput, centerValues[0].toInt(), centerValues[1].toInt(), centerValues[2].toInt(), centerValues[3].toInt())
-            inferenceImageHand(resizedImage)
+            var centerValues = landmarks.getLandmarkCenterImage(imageInput)
+            Log.d("imageInput.width", imageInput.width.toString())
+            Log.d("imageInput.height", imageInput.height.toString())
+            Log.d("centerValues", centerValues.toString())
+            var resizedImage = Bitmap.createBitmap(imageInput, centerValues[6].toInt(), centerValues[7].toInt(), centerValues[2].toInt(), centerValues[3].toInt())
+            // FOR DEBUGGING BITMAP
+            Log.d("resizedImage.width", resizedImage.width.toString())
+            Log.d("resizedImage.height", resizedImage.height.toString())
+            this.runOnUiThread {
+                bitmap_preview.setImageBitmap(resizedImage)
+            }
+//            inferenceImageHand(resizedImage)
             ++handIndex
         }
     }
@@ -208,6 +220,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             associatedAxisLabels!!,
             probabilityProcessor.process(probabilityBuffer)
         )
+        Log.d("labels", labels.toString())
 
         val floatMap = labels.mapWithFloatValue
     }
@@ -312,7 +325,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     protected fun onPreviewDisplaySurfaceChanged(
         holder: SurfaceHolder?, format: Int, width: Int, height: Int
     ) {
-        val viewSize = computeViewSize(width, height)
+        viewSize = computeViewSize(width, height)
         val displaySize: Size = cameraHelper!!.computeDisplaySizeFromViewSize(viewSize)
         val isCameraRotated: Boolean = cameraHelper!!.isCameraRotated()
 
