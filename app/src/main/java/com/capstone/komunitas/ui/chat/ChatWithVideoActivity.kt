@@ -85,13 +85,14 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     private var viewSize: Size? = null
 
     // TFLite things
-    val tfliteInterpreter by lazy {
+    private val tfliteInterpreter by lazy {
         Interpreter(loadModelFile())
     }
-    val tfliteInputBuffer = ByteBuffer.allocateDirect(4 * 42 * 1)
+    private val tfliteInputBuffer = ByteBuffer.allocateDirect(4 * 42 * 1)
         .apply { order(nativeOrder()) }
-    val ASSOCIATED_AXIS_LABELS = "sign_language_v1.txt"
-    var associatedAxisLabels: List<String>? = null
+    private val ASSOCIATED_AXIS_LABELS = "finalmodel.txt"
+    private val TFLITE_MODEL = "Final_model_latency.tflite"
+    private var associatedAxisLabels: List<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,7 +120,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
 
     private fun loadModelFile(): MappedByteBuffer {
         loadLabelFile()
-        val fileDescriptor: AssetFileDescriptor = assets.openFd("Final_model_default.tflite")
+        val fileDescriptor: AssetFileDescriptor = assets.openFd(TFLITE_MODEL)
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel: FileChannel = inputStream.channel
         val startOffset: Long = fileDescriptor.startOffset
@@ -196,14 +197,14 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             this.runOnUiThread {
                 bitmap_preview.setImageBitmap(resizedImage)
             }
-//            inferenceImageHand(resizedImage)
+            inferenceImageHand(resizedImage)
             ++handIndex
         }
     }
 
     private fun inferenceImageHand(imageInput: Bitmap) {
         val imageProcessor = ImageProcessor.Builder()
-            .add(ResizeOp(150, 150, ResizeOp.ResizeMethod.BILINEAR))
+            .add(ResizeOp(300, 300, ResizeOp.ResizeMethod.BILINEAR))
             .build()
 
         var tensorImage = TensorImage(DataType.UINT8)
@@ -211,18 +212,22 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         tensorImage.load(imageInput)
         tensorImage = imageProcessor.process(tensorImage)
 
-        val probabilityBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 1001), DataType.UINT8)
-        tfliteInterpreter.run(tensorImage.buffer, probabilityBuffer)
+        val probabilityBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 1001), DataType.FLOAT32)
+        val outputArray = arrayOf(FloatArray(19))
 
-        val probabilityProcessor = TensorProcessor.Builder().add(NormalizeOp(0F, 255F)).build()
+        tfliteInterpreter.run(tensorImage.buffer, outputArray)
+        var labelResult = outputArray[0].getTopLabel(associatedAxisLabels!!)
+        Log.d("labelResult", labelResult.toString())
 
-        val labels = TensorLabel(
-            associatedAxisLabels!!,
-            probabilityProcessor.process(probabilityBuffer)
-        )
-        Log.d("labels", labels.toString())
-
-        val floatMap = labels.mapWithFloatValue
+//        val probabilityProcessor = TensorProcessor.Builder().add(NormalizeOp(0F, 255F)).build()
+//
+//        val labels = TensorLabel(
+//            associatedAxisLabels!!,
+//            probabilityProcessor.process(probabilityBuffer)
+//        )
+//        Log.d("labels", labels.toString())
+//
+//        val floatMap = labels.mapWithFloatValue
     }
 
     private fun inferenceHandLandmarks(multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>) {

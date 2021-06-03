@@ -25,18 +25,12 @@
         android:supportsRtl="true"
         android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.Komunitas">
-        <activity
-            android:name=".ui.detection.camera_detection.DetectionObjectActivity">
-
-        </activity>
-        <activity android:name=".ui.detection.camera_detection.CameraActivity" android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".ui.chat.ChatNoVideoActivity" />
         <activity android:name=".ui.chat.ChatWithVideoActivity" />
         <activity android:name=".ui.home.HomeActivity"  />
         <activity android:name=".ui.auth.LoginActivity" />
         <activity android:name=".ui.auth.DaftarActivity" />
         <activity android:name=".ui.onboarding.OnboardingActivity" />
-        <activity android:name=".engines.MediaPipeActivity" />
         <activity
             android:name=".ui.splash.SplashscreenActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
