@@ -1,13 +1,10 @@
 package com.capstone.komunitas.ui.chat
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import androidx.camera.core.CameraSelector
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.capstone.komunitas.data.repositories.ChatRepository
-import com.capstone.komunitas.engines.AudioRecord
+import com.capstone.komunitas.engines.AudioRecordingEngine
 import com.capstone.komunitas.engines.TextToSpeechEngine
 import com.capstone.komunitas.util.ApiException
 import com.capstone.komunitas.util.Coroutines
@@ -16,9 +13,6 @@ import kotlinx.coroutines.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import java.io.File
-import java.io.InputStream
-import kotlin.coroutines.coroutineContext
 
 class ChatViewModel(
     private val repository: ChatRepository,
@@ -28,7 +22,7 @@ class ChatViewModel(
     var chatListener: ChatListener? = null
     var newMessageText: String? = null
     var isRecording: Boolean = false
-    val audioRecord = AudioRecord(context.applicationContext)
+    val audioRecord = AudioRecordingEngine(context.applicationContext)
 
     val chats by lazyDeferred {
         repository.getChat()

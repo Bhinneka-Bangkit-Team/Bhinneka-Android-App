@@ -1,11 +1,7 @@
 package com.capstone.komunitas.ui.chat
 
 import android.content.pm.PackageManager
-import android.media.MediaRecorder
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
-import android.view.ViewTreeObserver
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -14,18 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.capstone.komunitas.R
 import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.databinding.ActivityChatNoVideoBinding
-import com.capstone.komunitas.engines.AudioRecord
 import com.capstone.komunitas.util.*
 import com.google.mediapipe.components.PermissionHelper
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.android.synthetic.main.activity_chat_no_video.*
 import kotlinx.android.synthetic.main.activity_chat_no_video.progress_bar_chat_novideo
-import kotlinx.android.synthetic.main.activity_chat_with_video.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
-import java.io.*
-import java.lang.Exception
 
 
 class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {

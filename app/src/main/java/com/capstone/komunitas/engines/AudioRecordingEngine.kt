@@ -7,7 +7,7 @@ import android.util.Log
 import com.capstone.komunitas.data.network.responses.AudioTranslateResponse
 import java.io.*
 
-class AudioRecord(private val context: Context){
+class AudioRecordingEngine(private val context: Context){
     private lateinit var recorder:MediaRecorder
     private lateinit var fileOutput:String
 
