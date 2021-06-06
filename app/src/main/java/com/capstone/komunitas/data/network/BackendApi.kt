@@ -7,13 +7,10 @@ import com.capstone.komunitas.data.network.responses.ChatResponse
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
-import java.io.File
 
 interface BackendApi {
     @FormUrlEncoded
@@ -74,7 +71,8 @@ interface BackendApi {
 
             return Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl("https://api-dot-folkloric-ocean-308008.et.r.appspot.com/api/")
+                .baseUrl("http://192.168.1.17:8080/api/")
+//                .baseUrl("https://api-dot-folkloric-ocean-308008.et.r.appspot.com/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(BackendApi::class.java)

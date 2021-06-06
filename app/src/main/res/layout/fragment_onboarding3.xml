@@ -9,6 +9,16 @@
     tools:context=".ui.onboarding.Onboarding3Fragment">
 
     <ImageView
+        android:id="@+id/img_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/header_onboarding3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
         android:id="@+id/img_bottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

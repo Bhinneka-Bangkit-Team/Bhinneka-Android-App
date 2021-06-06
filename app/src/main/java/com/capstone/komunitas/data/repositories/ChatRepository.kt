@@ -1,6 +1,5 @@
 package com.capstone.komunitas.data.repositories
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.capstone.komunitas.data.db.AppDatabase
@@ -14,10 +13,8 @@ import com.capstone.komunitas.data.network.responses.ChatResponse
 import com.capstone.komunitas.util.Coroutines
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import java.io.File
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -99,8 +96,8 @@ class ChatRepository(
         }
     }
 
-
-
-
-    suspend fun deleteChats() = db.getChatDao().deleteChats()
+    suspend fun deleteChats(){
+        prefs.clearLastSavedAt()
+        db.getChatDao().deleteChats()
+    }
 }

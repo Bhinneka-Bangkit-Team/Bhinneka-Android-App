@@ -4,13 +4,16 @@
         <shape
             android:shape="rectangle">
             <solid android:color="@android:color/darker_gray" />
-            <corners android:radius="10dp"/>
+            <corners android:radius="20dp"/>
         </shape>
     </item>
     <item android:right="1dp" android:bottom="1dp">
-        <shape  android:shape="rectangle">
+        <shape
+            android:shape="rectangle">
             <solid android:color="@color/dusty_pink" />
-            <corners android:radius="10dp" />
+            <corners android:radius="20dp" />
         </shape>
     </item>
 </layer-list>
+
+

@@ -32,14 +32,20 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_logout"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="@color/blue"
+                android:text="@string/logout"
+                android:textAllCaps="false"
                 android:layout_marginHorizontal="30dp"
                 android:layout_marginVertical="30dp"
+                android:drawableLeft="@drawable/ic_exit_to_app"
                 android:onClick="@{viewmodel::onLogoutButtonClick}"
-                android:src="@drawable/ic_exit_to_app"
+                android:insetBottom="0dp"
+                app:backgroundTint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

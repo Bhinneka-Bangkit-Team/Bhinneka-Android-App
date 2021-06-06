@@ -28,11 +28,11 @@ class ChatViewModel(
         repository.getChat()
     }
 
-    fun changeLens(){
+    fun changeLens() {
         chatListener?.onChangeLens()
     }
 
-    fun<T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>>{
+    fun <T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>> {
         return lazy {
             GlobalScope.async(start = CoroutineStart.LAZY) {
                 block.invoke(this)
@@ -40,23 +40,28 @@ class ChatViewModel(
         }
     }
 
-    fun onRecordPressed(){
+    fun onRecordPressed() {
         isRecording = !isRecording
         chatListener?.onRecordPressed(isRecording)
-        if (isRecording){
+        if (isRecording) {
             audioRecord.startRecording()
-        }else{
+        } else {
             audioRecord.stopRecording()
-            Log.d("audioRecord", "onRecordPressed: "+audioRecord.uploadFile())
-            val requestBody = RequestBody.create(MediaType.parse("audio/*"),audioRecord.uploadFile())
-            val lang = RequestBody.create(MediaType.parse("text/plain"),"id-ID")
-            val body = MultipartBody.Part.createFormData("file",audioRecord.uploadFile().name,requestBody)
-            sendAudio(body,lang)
+            Log.d("audioRecord", "onRecordPressed: " + audioRecord.uploadFile())
+            val requestBody =
+                RequestBody.create(MediaType.parse("audio/*"), audioRecord.uploadFile())
+            val lang = RequestBody.create(MediaType.parse("text/plain"), "id-ID")
+            val body = MultipartBody.Part.createFormData(
+                "file",
+                audioRecord.uploadFile().name,
+                requestBody
+            )
+            sendAudio(body, lang)
 
         }
     }
 
-    fun speechChat(text: String?){
+    fun speechChat(text: String?) {
         textToSpeechEngine.textToSpeech(text!!)
     }
 
@@ -90,15 +95,15 @@ class ChatViewModel(
         }
     }
 
-    fun sendAudio(body:MultipartBody.Part,lang:RequestBody){
+    fun sendAudio(body: MultipartBody.Part, lang: RequestBody) {
         chatListener?.onSendStarted()
         Coroutines.main {
             try {
-                val responseTTS = repository.sendAudio(body,lang)
-                Log.d("AudioRecord", "sendAudio: ${responseTTS.message}" )
+                val responseTTS = repository.sendAudio(body, lang)
+                Log.d("AudioRecord", "sendAudio: ${responseTTS.message}")
                 responseTTS?.let {
 
-                    if (it.statusCode?.equals(200) == true){
+                    if (it.statusCode?.equals(200) == true) {
                         chatListener?.onSendSuccess("Berhasil mengambil audio pesan ${it.data}")
                         newMessageText = it.data
                         sendMessagePressed()
@@ -106,31 +111,31 @@ class ChatViewModel(
                     }
                 }
                 chatListener?.onSendFailure("Terjadi kesalahan")
-            }catch (e: ApiException){
-                Log.e("AudioRecord", "sendAudio: $e" )
-            }catch (e:NoInternetException){
-                Log.e("AudioRecord", "sendAudio: $e" )
+            } catch (e: ApiException) {
+                Log.e("AudioRecord", "sendAudio: $e")
+            } catch (e: NoInternetException) {
+                Log.e("AudioRecord", "sendAudio: $e")
             }
         }
     }
-     fun downloadAudio(text: String?){
+
+    fun downloadAudio(text: String?) {
+        Log.d("AUDIO:", text!!)
         Coroutines.main {
             try {
                 val responseSTT = repository.downloadAudio("test")
-                Log.d("AudioRecord", "sendAudio: ${responseSTT.message}" )
+                Log.d("AudioRecord", "sendAudio: ${responseSTT.message}")
                 responseSTT?.let {
-                    if (it.statusCode?.equals(200) == true){
+                    if (it.statusCode?.equals(200) == true) {
                         audioRecord.saveIntoAudio(it)
                         chatListener?.onSendSuccess("Berhasil mengambil audio pesan : ${it.message}")
                     }
                 }
-            }catch (e:ApiException){
-                Log.e("AudioRecord", "downloadAudio: $e" )
-            }catch (e:NoInternetException){
-                Log.e("AudioRecord", "downloadAudio: $e" )
+            } catch (e: ApiException) {
+                Log.e("AudioRecord", "downloadAudio: $e")
+            } catch (e: NoInternetException) {
+                Log.e("AudioRecord", "downloadAudio: $e")
             }
         }
     }
-
-
 }

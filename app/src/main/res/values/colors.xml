@@ -15,4 +15,9 @@
     <color name="full_transparent">#00000000</color>
     <color name="transparent_blue">#55425DA6</color>
     <color name="full_black">#000000</color>
+    <!--Custom Colors-->
+    <color name="custom_gray">#E0E0E0</color>
+    <color name="copyright_color">#BDBDBD</color>
+    <color name="custom_background">#E5E5E5</color>
+    <color name="color_text_primary">#333333</color>
 </resources>

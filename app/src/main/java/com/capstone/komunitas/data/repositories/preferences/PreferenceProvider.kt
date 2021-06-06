@@ -22,6 +22,10 @@ class PreferenceProvider(
         ).apply()
     }
 
+    fun clearLastSavedAt(){
+        preference.edit().remove(KEY_SAVED_AT).apply()
+    }
+
     fun getLastSavedAt(): String? {
         return preference.getString(KEY_SAVED_AT, null)
     }
@@ -35,6 +39,10 @@ class PreferenceProvider(
 
     fun getAuthToken(): String? {
         return preference.getString(KEY_AUTH_TOKEN, null)
+    }
+
+    fun clearAuthToken(){
+        preference.edit().remove(KEY_AUTH_TOKEN).apply()
     }
 
 }

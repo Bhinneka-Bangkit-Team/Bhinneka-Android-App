@@ -387,18 +387,18 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         progress_bar_chat_novideo.show()
         viewModel.chats.await().observe(this, Observer {
             progress_bar_chat_novideo.hide()
-            initRecyclerView(it)
+            initRecyclerView(it, viewModel)
         })
     }
 
-    private fun initRecyclerView(chatItem: List<Chat>) {
+    private fun initRecyclerView(chatItem: List<Chat>, viewModel: ChatViewModel) {
         val groupAdapter = GroupieAdapter()
 
         chatItem.forEach {
             if (it.isSpeaker == 1) {
                 groupAdapter.add(ChatReceivedItem(it))
             } else {
-                groupAdapter.add(ChatSentItem(it))
+                groupAdapter.add(ChatSentItem(it, viewModel))
             }
         }
 

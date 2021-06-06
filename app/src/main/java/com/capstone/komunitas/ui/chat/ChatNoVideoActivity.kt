@@ -10,11 +10,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.capstone.komunitas.R
 import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.databinding.ActivityChatNoVideoBinding
-import com.capstone.komunitas.util.*
+import com.capstone.komunitas.util.Coroutines
+import com.capstone.komunitas.util.hide
+import com.capstone.komunitas.util.show
+import com.capstone.komunitas.util.toast
 import com.google.mediapipe.components.PermissionHelper
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.android.synthetic.main.activity_chat_no_video.*
-import kotlinx.android.synthetic.main.activity_chat_no_video.progress_bar_chat_novideo
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
@@ -63,11 +65,11 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         progress_bar_chat_novideo.show()
         viewModel.chats.await().observe(this, Observer {
             progress_bar_chat_novideo.hide()
-            initRecyclerView(it)
+            initRecyclerView(it, viewModel)
         })
     }
 
-    private fun initRecyclerView(chatItem: List<Chat>) {
+    private fun initRecyclerView(chatItem: List<Chat>, viewModel: ChatViewModel) {
         val groupAdapter = GroupieAdapter()
 
         if(chatItem.isEmpty()){
@@ -80,7 +82,7 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
                 if (it.isSpeaker == 1) {
                     groupAdapter.add(ChatReceivedItem(it))
                 } else {
-                    groupAdapter.add(ChatSentItem(it))
+                    groupAdapter.add(ChatSentItem(it, viewModel))
                 }
             }
 
@@ -151,9 +153,6 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             }
         }
     }
-
-
-
 
     companion object{
         private const val TAG_AUDIO="AudioRecord"

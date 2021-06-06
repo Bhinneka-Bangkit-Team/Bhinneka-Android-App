@@ -35,5 +35,8 @@ class UserRepository(
 
     fun getUser() = db.getUserDao().getuser()
 
-    suspend fun deleteUser() = db.getUserDao().deleteuser()
+    suspend fun deleteUser(){
+        prefs.clearAuthToken()
+        db.getUserDao().deleteuser()
+    }
 }
