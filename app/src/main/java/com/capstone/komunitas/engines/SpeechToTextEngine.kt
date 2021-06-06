@@ -16,12 +16,8 @@ class SpeechToTextEngine(
 ) {
     private val appContext = context.applicationContext
 
-     suspend fun startSpeechToText():String? {
+     fun startSpeechToText():String? {
         var textResult: String? = ""
-
-         if(!isAudioPermissionGranted()){
-             return textResult
-         }
 
         val speechRecognizer = SpeechRecognizer.createSpeechRecognizer(appContext)
         val speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -39,7 +35,6 @@ class SpeechToTextEngine(
             override fun onEndOfSpeech() {
                 TODO("Not yet implemented")
             }
-//            override fun onEndOfSpeech() {}
 
             override fun onError(i: Int) {}
 
@@ -57,14 +52,5 @@ class SpeechToTextEngine(
         })
         speechRecognizer.startListening(speechRecognizerIntent)
         return textResult
-    }
-
-    private fun isAudioPermissionGranted(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {  // M = 23
-            if (ContextCompat.checkSelfPermission(appContext, "android.permission.RECORD_AUDIO") == PackageManager.PERMISSION_GRANTED) {
-                return true
-            }
-        }
-        return false
     }
 }

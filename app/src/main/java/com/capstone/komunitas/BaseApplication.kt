@@ -1,7 +1,6 @@
 package com.capstone.komunitas
 
 import android.app.Application
-import android.content.Context
 import com.capstone.komunitas.data.db.AppDatabase
 import com.capstone.komunitas.data.db.PreferenceProvider
 import com.capstone.komunitas.data.network.BackendApi

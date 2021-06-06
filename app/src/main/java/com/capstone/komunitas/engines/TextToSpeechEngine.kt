@@ -1,7 +1,6 @@
 package com.capstone.komunitas.engines
 
 import android.content.Context
-import android.os.Build
 import android.speech.tts.TextToSpeech
 import java.util.*
 
@@ -11,12 +10,11 @@ class TextToSpeechEngine (
     private val appContext = context.applicationContext
 
     private val textToSpeechEngine: TextToSpeech by lazy {
-        TextToSpeech(appContext,
-            TextToSpeech.OnInitListener { status ->
-                if (status == TextToSpeech.SUCCESS) {
-                    textToSpeechEngine.language = Locale.getDefault()
-                }
-            })
+        TextToSpeech(appContext) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                textToSpeechEngine.language = Locale.getDefault()
+            }
+        }
     }
 
     fun textToSpeech(text:String){

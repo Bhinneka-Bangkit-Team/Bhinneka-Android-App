@@ -34,7 +34,6 @@ class AudioRecordingEngine(private val context: Context){
     }
 
      fun stopRecording(){
-
          try{
              if(recorder!=null){
                  recorder.stop()
@@ -46,7 +45,6 @@ class AudioRecordingEngine(private val context: Context){
              e.printStackTrace()
              Log.e(TAG_AUDIO, "startRecording: Failed to stop! $e" )
          }
-
     }
 
      fun readFile(){

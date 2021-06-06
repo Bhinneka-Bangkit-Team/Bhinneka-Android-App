@@ -4,7 +4,6 @@ import android.view.View
 import com.capstone.komunitas.R
 import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.databinding.ListItemMessageReceivedBinding
-import com.capstone.komunitas.databinding.ListItemMessageSentBinding
 import com.xwray.groupie.viewbinding.BindableItem
 
 class ChatReceivedItem(

@@ -32,16 +32,11 @@ import org.kodein.di.generic.instance
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
-import org.tensorflow.lite.support.common.TensorProcessor
-import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.label.TensorLabel
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
-import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder.nativeOrder
@@ -128,7 +123,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
-    fun initMediaPipe() {
+    private fun initMediaPipe() {
         previewDisplayView = SurfaceView(this)
         setupPreviewDisplayView()
         AndroidAssetUtil.initializeNativeAssetManager(this)
@@ -186,11 +181,11 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         var handIndex = 0
         for (landmarks: LandmarkProto.NormalizedLandmarkList in multiHandLandmarks) {
             var resultList: MutableList<Float> = ArrayList()
-            var centerValues = landmarks.getLandmarkCenterImage(imageInput)
+            val centerValues = landmarks.getLandmarkCenterImage(imageInput)
             Log.d("imageInput.width", imageInput.width.toString())
             Log.d("imageInput.height", imageInput.height.toString())
             Log.d("centerValues", centerValues.toString())
-            var resizedImage = Bitmap.createBitmap(imageInput, centerValues[6].toInt(), centerValues[7].toInt(), centerValues[2].toInt(), centerValues[3].toInt())
+            val resizedImage = Bitmap.createBitmap(imageInput, centerValues[6].toInt(), centerValues[7].toInt(), centerValues[2].toInt(), centerValues[3].toInt())
             // FOR DEBUGGING BITMAP
             Log.d("resizedImage.width", resizedImage.width.toString())
             Log.d("resizedImage.height", resizedImage.height.toString())
@@ -304,30 +299,29 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         PermissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    protected fun onCameraStarted(surfaceTexture: SurfaceTexture?) {
+    private fun onCameraStarted(surfaceTexture: SurfaceTexture?) {
         previewFrameTexture = surfaceTexture
         previewDisplayView!!.visibility = View.VISIBLE
     }
 
-    protected fun cameraTargetResolution(): Size? {
+    private fun cameraTargetResolution(): Size? {
         return null // No preference and let the camera (helper) decide.
     }
 
-    fun startCamera() {
+    private fun startCamera() {
         cameraHelper = CameraXPreviewHelper()
-        cameraHelper!!.setOnCameraStartedListener(
-            { surfaceTexture -> onCameraStarted(surfaceTexture) })
+        cameraHelper!!.setOnCameraStartedListener { surfaceTexture -> onCameraStarted(surfaceTexture) }
         val cameraFacing: CameraHelper.CameraFacing = lensFacing
         cameraHelper!!.startCamera(
             this, cameraFacing,  /*unusedSurfaceTexture=*/null, cameraTargetResolution()
         )
     }
 
-    protected fun computeViewSize(width: Int, height: Int): Size {
+    private fun computeViewSize(width: Int, height: Int): Size {
         return Size(width, height)
     }
 
-    protected fun onPreviewDisplaySurfaceChanged(
+    private fun onPreviewDisplaySurfaceChanged(
         holder: SurfaceHolder?, format: Int, width: Int, height: Int
     ) {
         viewSize = computeViewSize(width, height)
@@ -372,7 +366,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
                 })
     }
 
-    fun bindAppBar(viewModel: ChatViewModel) {
+    private fun bindAppBar(viewModel: ChatViewModel) {
         // Back listener
         chat_with_vid_appbar.setNavigationOnClickListener {
             onBack()

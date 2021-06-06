@@ -36,7 +36,6 @@ class Onboarding1Fragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_onboarding1, container, false)
-
     }
 
     companion object {
