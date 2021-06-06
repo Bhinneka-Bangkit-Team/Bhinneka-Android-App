@@ -66,7 +66,7 @@ class AudioRecordingEngine(private val context: Context){
         }
     }
 
-    fun uploadFile():File{
+    fun uploadFile():File{fileOutput
         return File(fileOutput)
     }
 
