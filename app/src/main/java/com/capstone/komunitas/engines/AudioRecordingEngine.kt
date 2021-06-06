@@ -1,8 +1,10 @@
 package com.capstone.komunitas.engines
 
 import android.content.Context
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.os.Environment
+import android.net.Uri
 import android.util.Log
 import com.capstone.komunitas.data.network.responses.AudioTranslateResponse
 import java.io.*
@@ -70,21 +72,35 @@ class AudioRecordingEngine(private val context: Context){
         return File(fileOutput)
     }
 
+    fun playAudio(audioUri: Uri){
+        val mediaPlayer = MediaPlayer().apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            setDataSource(context, audioUri)
+            prepare()
+            start()
+        }
+    }
+
     fun saveIntoAudio(responseBody: AudioTranslateResponse):Boolean{
         try {
-
-            var finalFile  = File(Environment.getExternalStorageDirectory().absolutePath+"/recording_download.3gp")
+            var finalFile = context.filesDir.absolutePath+"/recording_download.mp3"
+//            var finalFile  = File(Environment.getExternalStorageDirectory().absolutePath+"/recording_download.3gp")
             var inputStream:InputStream? = null
             var outputStream:OutputStream? =null
 
             try {
                 val fileReader = ByteArray(1024)
-                val responseAudioIntArray = responseBody.data
+                val responseAudioIntArray = convertIntArrayToByteArray(responseBody.data!!.data)
 
                 var fileSizeDownloaded = 0
-                val arr = responseAudioIntArray?.remaining()?.let { ByteArray(it) }
-                responseAudioIntArray?.get(arr)
-                val byte = ByteArrayInputStream(arr)
+//                val arr = responseAudioIntArray?.remaining()?.let { ByteArray(it) }
+//                responseAudioIntArray?.get(arr)
+                val byte = ByteArrayInputStream(responseAudioIntArray)
                  inputStream = BufferedInputStream(byte)
                 outputStream = FileOutputStream(finalFile)
                 while (true){
@@ -98,6 +114,8 @@ class AudioRecordingEngine(private val context: Context){
                     Log.d(TAG_AUDIO, "File Download: " + fileSizeDownloaded + " of ")
                 }
                 outputStream.flush()
+                finalFile = context.filesDir.absolutePath+"/recording.3gp"
+                playAudio(Uri.parse(finalFile))
                 return true
             }catch (e:IOException){
                 Log.e(TAG_AUDIO, "File Download: $e")

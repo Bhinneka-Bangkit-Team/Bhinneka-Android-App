@@ -43,8 +43,6 @@ interface BackendApi {
         @Field("lang") lang: String
     ): Response<ChatResponse>
 
-
-
     @Multipart
     @POST("google/stt")
     suspend fun sendAudio(

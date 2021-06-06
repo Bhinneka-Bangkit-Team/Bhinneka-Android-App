@@ -1,16 +1,13 @@
 package com.capstone.komunitas.data.network.responses
 
-import java.nio.Buffer
-import java.nio.ByteBuffer
-
 class AudioTranslateResponse (
     val statusCode: Int? = null,
     val message: String? = null,
-    val data: ByteBuffer? = null,
+    val data: DataBuffer? = null,
     val error: String? = null
         )
 
-class dataBuffer(
+class DataBuffer(
     val type:String? = null,
-    val data: Buffer? = null
+    val data: Array<Int>? = null
 )

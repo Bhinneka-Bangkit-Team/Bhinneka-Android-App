@@ -81,18 +81,14 @@ class ChatRepository(
     }
 
     suspend fun sendAudio(multi: MultipartBody.Part,lang:RequestBody): AudioResponse {
-        val token = "Bearer "+prefs.getAuthToken()
         return apiRequest {
-            api.sendAudio(token,multi,lang)
+            api.sendAudio("Bearer "+prefs.getAuthToken(),multi,lang)
         }
     }
 
     suspend fun downloadAudio(text:String):AudioTranslateResponse{
-
-        return withContext(Dispatchers.IO){
-            apiRequest {
-                api.getAudio("Bearer "+prefs.getAuthToken(),text,"id-ID")
-            }
+        return apiRequest {
+            api.getAudio("Bearer "+prefs.getAuthToken(),text,"id-ID")
         }
     }
 

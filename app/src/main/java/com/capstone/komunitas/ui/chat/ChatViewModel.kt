@@ -82,7 +82,8 @@ class ChatViewModel(
                 val chatResponse = repository.sendChat(messageText, isSpeaker)
                 chatResponse?.let {
                     if (it.data!!.size > 0) {
-                        speechChat(messageText)
+//                        speechChat(messageText)
+                        downloadAudio(messageText)
                         repository.saveChat(it.data)
                         chatListener?.onSendSuccess("Berhasil mengambil pesan")
                         return@main
@@ -120,9 +121,10 @@ class ChatViewModel(
 
     fun downloadAudio(text: String?) {
         Log.d("AUDIO:", text!!)
+        chatListener?.onGetStarted()
         Coroutines.main {
             try {
-                val responseSTT = repository.downloadAudio("test")
+                val responseSTT = repository.downloadAudio(text)
                 Log.d("AudioRecord", "sendAudio: ${responseSTT.message}")
                 responseSTT?.let {
                     if (it.statusCode?.equals(200) == true) {
