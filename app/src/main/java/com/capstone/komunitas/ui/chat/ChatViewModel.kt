@@ -4,15 +4,15 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.capstone.komunitas.data.repositories.ChatRepository
-import com.capstone.komunitas.engines.AudioRecordingEngine
 import com.capstone.komunitas.engines.TextToSpeechEngine
+import com.capstone.komunitas.engines.VoiceRecorder
 import com.capstone.komunitas.util.ApiException
 import com.capstone.komunitas.util.Coroutines
 import com.capstone.komunitas.util.NoInternetException
 import kotlinx.coroutines.*
-import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+
 
 class ChatViewModel(
     private val repository: ChatRepository,
@@ -22,7 +22,31 @@ class ChatViewModel(
     var chatListener: ChatListener? = null
     var newMessageText: String? = null
     var isRecording: Boolean = false
-    val audioRecord = AudioRecordingEngine(context.applicationContext)
+    var audioRecord: VoiceRecorder? = null
+    val AUDIO_TAG = "AUDIO_RECORD"
+
+    private val mVoiceCallback: VoiceRecorder.Callback = object : VoiceRecorder.Callback() {
+        override fun onVoiceStart() {
+            Log.d(AUDIO_TAG, "VOICE STARTED")
+        }
+        override fun onVoice(data: ByteArray?, size: Int) {
+            Log.d(AUDIO_TAG, "VOICE HEARD")
+        }
+
+        override fun onVoiceEnd() {
+            Log.d(AUDIO_TAG, "VOICE ENDED")
+//            Log.d("audioRecord", "onRecordPressed: " + audioRecord.uploadFile())
+//            val requestBody =
+//                RequestBody.create(MediaType.parse("audio/*"), audioRecord.uploadFile())
+//            val lang = RequestBody.create(MediaType.parse("text/plain"), "id-ID")
+//            val body = MultipartBody.Part.createFormData(
+//                "file",
+//                audioRecord.uploadFile().name,
+//                requestBody
+//            )
+//            sendAudio(body, lang)
+        }
+    }
 
     val chats by lazyDeferred {
         repository.getChat()
@@ -41,23 +65,16 @@ class ChatViewModel(
     }
 
     fun onRecordPressed() {
+        Log.d(AUDIO_TAG, "RECORD BUTTON PRESSED")
         isRecording = !isRecording
         chatListener?.onRecordPressed(isRecording)
+        audioRecord = VoiceRecorder(mVoiceCallback)
         if (isRecording) {
-            audioRecord.startRecording()
+            Log.d(AUDIO_TAG, "RECORDING STARTED")
+            audioRecord!!.start()
         } else {
-            audioRecord.stopRecording()
-            Log.d("audioRecord", "onRecordPressed: " + audioRecord.uploadFile())
-            val requestBody =
-                RequestBody.create(MediaType.parse("audio/*"), audioRecord.uploadFile())
-            val lang = RequestBody.create(MediaType.parse("text/plain"), "id-ID")
-            val body = MultipartBody.Part.createFormData(
-                "file",
-                audioRecord.uploadFile().name,
-                requestBody
-            )
-            sendAudio(body, lang)
-
+            Log.d(AUDIO_TAG, "RECORDING ENDED")
+            audioRecord!!.stop()
         }
     }
 
@@ -127,7 +144,6 @@ class ChatViewModel(
                 Log.d("AudioRecord", "sendAudio: ${responseSTT.message}")
                 responseSTT?.let {
                     if (it.statusCode?.equals(200) == true) {
-                        audioRecord.saveIntoAudio(it)
                         chatListener?.onSendSuccess("Berhasil mengambil audio pesan : ${it.message}")
                     }
                 }
