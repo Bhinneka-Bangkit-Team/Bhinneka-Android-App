@@ -21,6 +21,7 @@ class ChatViewModel(
 ) : ViewModel() {
     var chatListener: ChatListener? = null
     var newMessageText: String? = null
+    var audioMessageText: String? = null
     var isRecording: Boolean = false
     val audioRecord = AudioRecordingEngine(context.applicationContext)
 
@@ -57,7 +58,6 @@ class ChatViewModel(
                 requestBody
             )
             sendAudio(body, lang)
-
         }
     }
 
@@ -72,17 +72,19 @@ class ChatViewModel(
             chatListener?.onSendFailure("Pesan tidak boleh kosong")
             return
         }
+        sendMessage(newMessageText!!,0)
+    }
 
+    fun sendMessage(messageText:String, isSpeaker: Int){
         // Call api via kotlin coroutines
         Coroutines.main {
             try {
-                val chatResponse = repository.sendChat(newMessageText!!, 0)
+                val chatResponse = repository.sendChat(messageText, isSpeaker)
                 chatResponse?.let {
                     if (it.data!!.size > 0) {
-                        speechChat(newMessageText!!)
+                        speechChat(messageText)
                         repository.saveChat(it.data)
                         chatListener?.onSendSuccess("Berhasil mengambil pesan")
-                        newMessageText = null
                         return@main
                     }
                 }
@@ -92,8 +94,7 @@ class ChatViewModel(
             } catch (e: NoInternetException) {
                 chatListener?.onSendFailure(e.message!!)
             }
-        }
-    }
+        }}
 
     fun sendAudio(body: MultipartBody.Part, lang: RequestBody) {
         chatListener?.onSendStarted()
@@ -102,11 +103,9 @@ class ChatViewModel(
                 val responseTTS = repository.sendAudio(body, lang)
                 Log.d("AudioRecord", "sendAudio: ${responseTTS.message}")
                 responseTTS?.let {
-
                     if (it.statusCode?.equals(200) == true) {
                         chatListener?.onSendSuccess("Berhasil mengambil audio pesan ${it.data}")
-                        newMessageText = it.data
-                        sendMessagePressed()
+                        sendMessage(it.data!!, 1)
                         return@main
                     }
                 }

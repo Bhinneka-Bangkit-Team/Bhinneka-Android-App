@@ -16,7 +16,7 @@ class AudioRecordingEngine(private val context: Context){
         fileOutput = context.filesDir.absolutePath+"/recording.3gp"
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-        recorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB)
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
 
         try {
             recorder.setOutputFile(fileOutput)
