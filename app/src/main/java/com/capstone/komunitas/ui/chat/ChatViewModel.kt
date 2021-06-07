@@ -2,7 +2,9 @@ package com.capstone.komunitas.ui.chat
 
 import android.content.Context
 import android.util.Log
+import android.widget.ImageButton
 import androidx.lifecycle.ViewModel
+import com.capstone.komunitas.R
 import com.capstone.komunitas.data.repositories.ChatRepository
 import com.capstone.komunitas.engines.AudioRecordingEngine
 import com.capstone.komunitas.engines.TextToSpeechEngine
@@ -83,7 +85,9 @@ class ChatViewModel(
                 chatResponse?.let {
                     if (it.data!!.size > 0) {
 //                        speechChat(messageText)
-                        downloadAudio(messageText)
+                        if(isSpeaker==1){
+                            downloadAudio(messageText)
+                        }
                         repository.saveChat(it.data)
                         chatListener?.onSendSuccess("Berhasil mengambil pesan")
                         return@main
@@ -119,6 +123,28 @@ class ChatViewModel(
         }
     }
 
+    fun listenAudio(text: String?, replayChat: ImageButton){
+        chatListener?.onGetStarted()
+        replayChat.setImageResource(R.drawable.ic_pause_softerblue)
+        Coroutines.main {
+            try {
+                val responseSTT = repository.downloadAudio(text!!)
+                Log.d("AudioRecord", "sendAudio: ${responseSTT.message}")
+                responseSTT?.let {
+                    if (it.statusCode?.equals(200) == true) {
+                        Log.d("AudioRecord", "it.data: ${it.data}")
+                        audioRecord.replayAudio(it.data!!, replayChat)
+                        chatListener?.onSendSuccess("Berhasil mengambil audio pesan : ${it.message}")
+                    }
+                }
+            } catch (e: ApiException) {
+                Log.e("AudioRecord", "downloadAudio: $e")
+            } catch (e: NoInternetException) {
+                Log.e("AudioRecord", "downloadAudio: $e")
+            }
+        }
+    }
+
     fun downloadAudio(text: String?) {
         Log.d("AUDIO:", text!!)
         chatListener?.onGetStarted()
@@ -128,7 +154,8 @@ class ChatViewModel(
                 Log.d("AudioRecord", "sendAudio: ${responseSTT.message}")
                 responseSTT?.let {
                     if (it.statusCode?.equals(200) == true) {
-                        audioRecord.saveIntoAudio(it)
+                        Log.d("AudioRecord", "it.data: ${it.data}")
+                        audioRecord.playAudio(it.data!!)
                         chatListener?.onSendSuccess("Berhasil mengambil audio pesan : ${it.message}")
                     }
                 }

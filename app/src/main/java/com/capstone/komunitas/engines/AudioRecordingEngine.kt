@@ -4,10 +4,10 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.net.Uri
 import android.util.Log
-import com.capstone.komunitas.data.network.responses.AudioTranslateResponse
-import java.io.*
+import android.widget.ImageButton
+import com.capstone.komunitas.R
+import java.io.File
 
 class AudioRecordingEngine(private val context: Context){
     private lateinit var recorder:MediaRecorder
@@ -49,30 +49,11 @@ class AudioRecordingEngine(private val context: Context){
          }
     }
 
-     fun readFile(){
-        var inputStream: InputStream? = null
-        try {
-            inputStream = BufferedInputStream(FileInputStream(fileOutput))
-        }catch (e:FileNotFoundException){
-            e.printStackTrace()
-        }
-
-        finally {
-            if (inputStream!=null){
-                try {
-                    inputStream.close()
-                }catch (e:IOException){
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
-
     fun uploadFile():File{
         return File(fileOutput)
     }
 
-    fun playAudio(audioUri: Uri){
+    fun replayAudio(audioUrl: String, replayChat: ImageButton){
         val mediaPlayer = MediaPlayer().apply {
             setAudioAttributes(
                 AudioAttributes.Builder()
@@ -80,78 +61,30 @@ class AudioRecordingEngine(private val context: Context){
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build()
             )
-            setDataSource(context, audioUri)
+            setDataSource(audioUrl)
             prepare()
+            setOnCompletionListener {
+                replayChat.setImageResource(R.drawable.ic_play_softerblue)
+            }
             start()
         }
     }
 
-    fun saveIntoAudio(responseBody: AudioTranslateResponse):Boolean{
-        try {
-            var finalFile = context.filesDir.absolutePath+"/recording_download.mp3"
-//            var finalFile  = File(Environment.getExternalStorageDirectory().absolutePath+"/recording_download.3gp")
-            var inputStream:InputStream? = null
-            var outputStream:OutputStream? =null
-
-            try {
-                val fileReader = ByteArray(1024)
-                val responseAudioIntArray = convertIntArrayToByteArray(responseBody.data!!.data)
-
-                var fileSizeDownloaded = 0
-//                val arr = responseAudioIntArray?.remaining()?.let { ByteArray(it) }
-//                responseAudioIntArray?.get(arr)
-                val byte = ByteArrayInputStream(responseAudioIntArray)
-                 inputStream = BufferedInputStream(byte)
-                outputStream = FileOutputStream(finalFile)
-                while (true){
-                    var read = inputStream.read(fileReader)
-                    if (read == -1){
-                        break
-                    }
-                    outputStream.write(fileReader,0,read)
-                    fileSizeDownloaded += read
-
-                    Log.d(TAG_AUDIO, "File Download: " + fileSizeDownloaded + " of ")
-                }
-                outputStream.flush()
-                finalFile = context.filesDir.absolutePath+"/recording.3gp"
-                playAudio(Uri.parse(finalFile))
-                return true
-            }catch (e:IOException){
-                Log.e(TAG_AUDIO, "File Download: $e")
-               return false
-            }finally {
-                if (inputStream != null){
-                    inputStream.close()
-                }
-
-                if (outputStream!=null){
-                    outputStream.close()
-                }
-            }
-        }catch (e:IOException){
-                return false
+    fun playAudio(audioUrl: String){
+        val mediaPlayer = MediaPlayer().apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            setDataSource(audioUrl)
+            prepare()
+            start()
         }
     }
 
     companion object{
         private const val TAG_AUDIO="AudioRecord"
     }
-
-    @Throws(IOException::class)
-    private fun convertIntToByteArray(i: Int): ByteArray? {
-        val bos = ByteArrayOutputStream()
-        val dos = DataOutputStream(bos)
-        dos.writeInt(i)
-        dos.flush()
-        return bos.toByteArray()
-    }
-
-    private fun convertIntArrayToByteArray(data: Array<Int>?): ByteArray? {
-        if (data == null) return null
-        val byts = ByteArray(data.size * 4)
-        for (i in data.indices) System.arraycopy(convertIntToByteArray(data[i]), 0, byts, i * 4, 4)
-        return byts
-    }
-
 }

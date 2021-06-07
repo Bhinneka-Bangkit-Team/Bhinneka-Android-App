@@ -20,9 +20,9 @@ class ChatSentItem(
 
     override fun bind(viewBinding: ListItemMessageSentBinding, position: Int) {
         viewBinding.message = chat
-        viewBinding.micChat.setOnClickListener{
+        viewBinding.replayChat.setOnClickListener{
             Log.d("RECYCLERVIEW","MIC CHAT BUTTON PRESSED")
-            viewModel.downloadAudio(chat.text!!)
+            viewModel.listenAudio(chat.text!!, viewBinding.replayChat)
         }
     }
 }

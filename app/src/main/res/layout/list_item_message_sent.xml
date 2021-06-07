@@ -50,7 +50,7 @@
                 tools:text="This is a message This is a message This is a message This is a message This is a message This is a message This is a message This is a message " />
 
             <ImageButton
-                android:id="@+id/mic_chat"
+                android:id="@+id/replay_chat"
                 android:background="@drawable/round_rectangle_primary"
                 android:src="@drawable/ic_play_softerblue"
                 android:padding="5dp"
