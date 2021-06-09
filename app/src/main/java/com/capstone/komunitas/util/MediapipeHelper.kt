@@ -1,7 +1,6 @@
 package com.capstone.komunitas.util
 
 import android.graphics.Bitmap
-import android.util.Size
 import com.google.mediapipe.formats.proto.LandmarkProto
 import org.tensorflow.lite.support.common.TensorProcessor
 import org.tensorflow.lite.support.common.ops.NormalizeOp
@@ -43,7 +42,8 @@ fun LandmarkProto.NormalizedLandmarkList.getLandmarkCenter(): List<Float> {
     return result
 }
 
-fun LandmarkProto.NormalizedLandmarkList.getLandmarkCenterImage(size: Bitmap): List<Float> {
+// For two hands
+fun List<LandmarkProto.NormalizedLandmarkList>.getLandmarkCenterImage(size: Bitmap): List<Float> {
     var xmax: Float = 0F
     var ymax: Float = 0F
     var xmin: Float = 99999F
@@ -52,30 +52,35 @@ fun LandmarkProto.NormalizedLandmarkList.getLandmarkCenterImage(size: Bitmap): L
     var landmarkIndex = 0
     var xcur: Float
     var ycur: Float
-    for (landmark: LandmarkProto.NormalizedLandmark in this.getLandmarkList()) {
-        xcur = landmark.getX()*size.width
-        ycur = landmark.getY()*size.height
-        if(xcur > size.width || ycur > size.height){
-            continue
-        }
 
-        if (xcur > xmax)
-            xmax = xcur
-        if (ycur > ymax)
-            ymax = ycur
-        if (xcur < xmin)
-            if(xcur < 0){
-                xmin = 0F
-            }else{
-                xmin = xcur
+    var handIndex = 0
+    for (landmarks: LandmarkProto.NormalizedLandmarkList in this) {
+        for (landmark: LandmarkProto.NormalizedLandmark in landmarks.landmarkList) {
+            xcur = landmark.getX()*size.width
+            ycur = landmark.getY()*size.height
+            if(xcur > size.width || ycur > size.height){
+                continue
             }
-        if (ycur < ymin)
-            if(ycur < 0){
-                ymin = 0F
-            }else{
-                ymin = ycur
-            }
-        ++landmarkIndex
+
+            if (xcur > xmax)
+                xmax = xcur
+            if (ycur > ymax)
+                ymax = ycur
+            if (xcur < xmin)
+                if(xcur < 0){
+                    xmin = 0F
+                }else{
+                    xmin = xcur
+                }
+            if (ycur < ymin)
+                if(ycur < 0){
+                    ymin = 0F
+                }else{
+                    ymin = ycur
+                }
+            ++landmarkIndex
+        }
+        ++handIndex
     }
 
     xcur = xmin + (xmax - xmin) / 2

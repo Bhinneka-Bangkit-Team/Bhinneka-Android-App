@@ -20,8 +20,13 @@ import com.capstone.komunitas.data.db.entities.Chat
 import com.capstone.komunitas.databinding.ActivityChatWithVideoBinding
 import com.capstone.komunitas.util.*
 import com.google.mediapipe.components.*
+import com.google.mediapipe.formats.proto.DetectionProto
+import com.google.mediapipe.formats.proto.DetectionProto.Detection
 import com.google.mediapipe.formats.proto.LandmarkProto
-import com.google.mediapipe.framework.*
+import com.google.mediapipe.framework.AndroidAssetUtil
+import com.google.mediapipe.framework.AndroidPacketCreator
+import com.google.mediapipe.framework.Packet
+import com.google.mediapipe.framework.PacketGetter
 import com.google.mediapipe.glutil.EglManager
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.android.synthetic.main.activity_chat_no_video.progress_bar_chat_novideo
@@ -57,8 +62,12 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         private val TAG = "MainActivity"
         private val BINARY_GRAPH_NAME = "hand_tracking_mobile_gpu.binarypb"
         private val INPUT_VIDEO_STREAM_NAME = "input_video"
+
         private val OUTPUT_VIDEO_STREAM_NAME = "throttled_input_video"
+
+        //        private val OUTPUT_VIDEO_STREAM_NAME = "output_video"
         private val OUTPUT_LANDMARKS_STREAM_NAME = "hand_landmarks"
+        private val OUTPUT_HANDEDNESS_STREAM_NAME = "handedness"
         private val INPUT_NUM_HANDS_SIDE_PACKET_NAME = "num_hands"
         private val NUM_HANDS = 2
         private val FLIP_FRAMES_VERTICALLY = true
@@ -68,6 +77,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
             System.loadLibrary("opencv_java3")
         }
     }
+
     private var lensFacing: CameraHelper.CameraFacing = CameraHelper.CameraFacing.FRONT
     private var isSurfaceAttached: Boolean = false
     private var previewFrameTexture: SurfaceTexture? = null
@@ -77,17 +87,24 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
     private var converter: ExternalTextureConverter? = null
     private var cameraHelper: CameraXPreviewHelper? = null
     private var mpImageBitmap: Bitmap? = null
+    private var handedness: List<DetectionProto.Detection>? = null
     private var viewSize: Size? = null
 
     // TFLite things
     private val tfliteInterpreter by lazy {
         Interpreter(loadModelFile())
     }
-    private val tfliteInputBuffer = ByteBuffer.allocateDirect(4 * 42 * 1)
+    private val tfliteInputBuffer = ByteBuffer.allocateDirect(4 * 84 * 1)
         .apply { order(nativeOrder()) }
-    private val ASSOCIATED_AXIS_LABELS = "finalmodel.txt"
-    private val TFLITE_MODEL = "Final_model_latency.tflite"
-    private var associatedAxisLabels: List<String>? = null
+    private val ASSOCIATED_AXIS_LABELS = "sign_language_v1.txt"
+    private val TFLITE_MODEL = "sign_language_v1.tflite"
+    private lateinit var associatedAxisLabels: MutableList<String>
+
+    // Inferencing logic
+    private var tobeSubmitted = ""
+    private var lastLabel = "-"
+    private var submittedLabel = "-"
+    private var time = System.currentTimeMillis()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,7 +118,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         viewModel.chatListener = this
 
         bindUI(viewModel)
-        initMediaPipe()
+        initMediaPipe(viewModel)
         bindAppBar(viewModel)
     }
 
@@ -123,7 +140,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
-    private fun initMediaPipe() {
+    private fun initMediaPipe(viewModel: ChatViewModel) {
         previewDisplayView = SurfaceView(this)
         setupPreviewDisplayView()
         AndroidAssetUtil.initializeNativeAssetManager(this)
@@ -147,6 +164,12 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         processor!!.setInputSidePackets(inputSidePackets)
 
         processor!!.addPacketCallback(
+            OUTPUT_HANDEDNESS_STREAM_NAME
+        ) { packet: Packet ->
+            Log.d(TAG, "Recieved handeness")
+            handedness = PacketGetter.getProtoVector(packet, Detection.parser())
+        }
+        processor!!.addPacketCallback(
             OUTPUT_LANDMARKS_STREAM_NAME
         ) { packet ->
             val multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList> =
@@ -154,50 +177,63 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
                     packet,
                     LandmarkProto.NormalizedLandmarkList.parser()
                 )
-//            inferenceHandLandmarks(multiHandLandmarks)
-            if(mpImageBitmap!=null){
-                inferenceImageLandmarks(mpImageBitmap!!, multiHandLandmarks)
+            if (handedness != null) {
+                inferenceHandLandmarks(multiHandLandmarks, viewModel, handedness!!)
             }
+//            if(mpImageBitmap!=null){
+//                inferenceImageLandmarks(mpImageBitmap!!, multiHandLandmarks, viewModel)
+//            }
         }
         processor!!.addPacketCallback(
             "throttled_input_video_cpu"
         ) { packet: Packet ->
-            Log.v(
-                TAG,
-                "Received input_image_cpu packet."
-            )
-            mpImageBitmap = AndroidPacketGetter.getBitmapFromRgba(packet)
+//            mpImageBitmap = AndroidPacketGetter.getBitmapFromRgba(packet)
+            if (System.currentTimeMillis() - time >= 1000) {
+                time = System.currentTimeMillis()
+                viewModel.sendMessage(tobeSubmitted,0)
+                tobeSubmitted = ""
+                viewModel.newMessageText.set("")
+                lastLabel = ""
+                submittedLabel = ""
+            }
         }
     }
 
-    private fun inferenceImageLandmarks(imageInput: Bitmap, multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>) {
+    private fun inferenceImageLandmarks(
+        imageInput: Bitmap,
+        multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>,
+        viewModel: ChatViewModel
+    ) {
         if (multiHandLandmarks.isEmpty()) {
             return
         }
-        if(viewSize == null){
+        if (viewSize == null) {
             return
         }
 
-        var handIndex = 0
-        for (landmarks: LandmarkProto.NormalizedLandmarkList in multiHandLandmarks) {
-            var resultList: MutableList<Float> = ArrayList()
-            val centerValues = landmarks.getLandmarkCenterImage(imageInput)
-            Log.d("imageInput.width", imageInput.width.toString())
-            Log.d("imageInput.height", imageInput.height.toString())
-            Log.d("centerValues", centerValues.toString())
-            val resizedImage = Bitmap.createBitmap(imageInput, centerValues[6].toInt(), centerValues[7].toInt(), centerValues[2].toInt(), centerValues[3].toInt())
-            // FOR DEBUGGING BITMAP
-            Log.d("resizedImage.width", resizedImage.width.toString())
-            Log.d("resizedImage.height", resizedImage.height.toString())
-            this.runOnUiThread {
-                bitmap_preview.setImageBitmap(resizedImage)
-            }
-            inferenceImageHand(resizedImage)
-            ++handIndex
+        var resultList: MutableList<Float> = ArrayList()
+        val centerValues = multiHandLandmarks.getLandmarkCenterImage(imageInput)
+
+        Log.d("imageInput.width", imageInput.width.toString())
+        Log.d("imageInput.height", imageInput.height.toString())
+        Log.d("centerValues", centerValues.toString())
+        val resizedImage = Bitmap.createBitmap(
+            imageInput,
+            centerValues[6].toInt(),
+            centerValues[7].toInt(),
+            centerValues[2].toInt(),
+            centerValues[3].toInt()
+        )
+        // FOR DEBUGGING BITMAP
+        Log.d("resizedImage.width", resizedImage.width.toString())
+        Log.d("resizedImage.height", resizedImage.height.toString())
+        this.runOnUiThread {
+            bitmap_preview.setImageBitmap(resizedImage)
         }
+        inferenceImageHand(resizedImage, viewModel)
     }
 
-    private fun inferenceImageHand(imageInput: Bitmap) {
+    private fun inferenceImageHand(imageInput: Bitmap, viewModel: ChatViewModel) {
         val imageProcessor = ImageProcessor.Builder()
             .add(ResizeOp(300, 300, ResizeOp.ResizeMethod.BILINEAR))
             .build()
@@ -211,64 +247,143 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         val outputArray = arrayOf(FloatArray(19))
 
         tfliteInterpreter.run(tensorImage.buffer, outputArray)
-        var labelResult = outputArray[0].getTopLabel(associatedAxisLabels!!)
+        val labelResult = outputArray[0].getTopLabel(associatedAxisLabels!!)
         Log.d("labelResult", labelResult.toString())
+        val (label, likelihood) = labelResult[0]
 
-//        val probabilityProcessor = TensorProcessor.Builder().add(NormalizeOp(0F, 255F)).build()
-//
-//        val labels = TensorLabel(
-//            associatedAxisLabels!!,
-//            probabilityProcessor.process(probabilityBuffer)
-//        )
-//        Log.d("labels", labels.toString())
-//
-//        val floatMap = labels.mapWithFloatValue
+        this.runOnUiThread {
+            if (label.length == 1) {
+                tv_preview_isyarat.text = tv_preview_isyarat.text.toString().plus(label)
+            } else {
+                tv_preview_isyarat.text = tv_preview_isyarat.text.toString().plus(" ").plus(label)
+            }
+            if (tv_preview_isyarat.text.length > 100) {
+                tv_preview_isyarat.text = label
+            }
+            viewModel.newMessageText.set(label)
+        }
     }
 
-    private fun inferenceHandLandmarks(multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>) {
+    private fun decisionAlgorithm(currentLabel: String) {
+        // If the label is the same as the last one
+        if (currentLabel.equals(lastLabel)) {
+
+        }
+    }
+
+    private fun inferenceHandLandmarks(
+        multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>,
+        viewModel: ChatViewModel,
+        handedness: List<Detection>
+    ) {
 
         if (multiHandLandmarks.isEmpty()) {
             return
         }
+        var fullLandmarksData: List<Float> = ArrayList()
+        var rightHandLandmark: MutableList<Float> = MutableList(42) { 0F }
+        var leftHandLandmark: MutableList<Float> = MutableList(42) { 0F }
+
+        var isLeftFound: Boolean = false
+        var isRightFound: Boolean = false
 
         var handIndex = 0
+        // If the number of hand and handedness is not the same
+        if (multiHandLandmarks.size != handedness.size) {
+            return
+        }
+
         for (landmarks: LandmarkProto.NormalizedLandmarkList in multiHandLandmarks) {
-            var resultList: MutableList<Float> = ArrayList()
-            var centerValues = landmarks.getLandmarkCenter()
+            val resultList: MutableList<Float> = ArrayList()
+            val centerValues = landmarks.getLandmarkCenter()
 
             var landmarkIndex = 0
             for (landmark: LandmarkProto.NormalizedLandmark in landmarks.getLandmarkList()) {
-                resultList.add(landmark.getX()-centerValues[0])
-                resultList.add(landmark.getY()-centerValues[1])
+                resultList.add(landmark.getX() - centerValues[0])
+                resultList.add(landmark.getY() - centerValues[1])
                 ++landmarkIndex
             }
             Log.d("resultList", resultList.toString())
             Log.d("resultList size", resultList.size.toString())
 
-//            val probabilityBuffer =
-//                TensorBuffer.createFixedSize(intArrayOf(1, 1001), DataType.UINT8)
-//            resultList.unwindToByteBuffer(tfliteInputBuffer)
-//            tfliteInterpreter.run(tfliteInputBuffer, probabilityBuffer.buffer)
-//            mapOutputToLabels(probabilityBuffer)
+            // Get handedness and clean all non alphanumeric characters
+            var landmarkHand = handedness[handIndex].getLabel(0).takeLast(5)
+            landmarkHand = Regex("[^A-Za-z]").replace(landmarkHand, "")
 
-            val outputArray = arrayOf(FloatArray(36))
-            resultList.unwindToByteBuffer(tfliteInputBuffer)
-            tfliteInterpreter.run(tfliteInputBuffer, outputArray)
-            var labelResult = outputArray[0].getTopLabel(associatedAxisLabels!!)
-            Log.d("labelResult", labelResult.toString())
-
-            val (label, likelihood) = labelResult[0]
-            this.runOnUiThread {
-                if(label.length==1){
-                    tv_preview_isyarat.text = tv_preview_isyarat.text.toString().plus(label)
-                }else{
-                    tv_preview_isyarat.text = tv_preview_isyarat.text.toString().plus(" ").plus(label)
+            if (landmarkHand == "Left") {
+                Log.d("IS LEFTs", landmarkHand)
+                // Check if double left hand found
+                if (isLeftFound) {
+                    return
                 }
-                if(tv_preview_isyarat.text.length > 100){
-                    tv_preview_isyarat.text = label
+                isLeftFound = true
+                leftHandLandmark = resultList
+            } else {
+                Log.d("IS RIGHTs", landmarkHand)
+                // Check if double right hand found
+                if (isRightFound) {
+                    return
+                }
+                isRightFound = true
+                rightHandLandmark = resultList
+            }
+            Log.d("landmarkHand label", landmarkHand)
+
+            ++handIndex
+        }
+        fullLandmarksData = leftHandLandmark + rightHandLandmark
+
+        val outputArray = arrayOf(FloatArray(91))
+        fullLandmarksData.unwindListToByteBuffer(tfliteInputBuffer)
+        tfliteInterpreter.run(tfliteInputBuffer, outputArray)
+        var labelResult = outputArray[0].getTopLabel(associatedAxisLabels)
+
+        val (label, likelihood) = labelResult[0]
+        Log.d("labelResult", labelResult.toString())
+        Log.d("lastLabel != label", (lastLabel != label).toString())
+        this.runOnUiThread {
+//            if (label.length == 1) {
+//                tv_preview_isyarat.text = tv_preview_isyarat.text.toString().plus(label)
+//            } else {
+//                tv_preview_isyarat.text =
+//                    tv_preview_isyarat.text.toString().plus(" ").plus(label)
+//            }
+//            if (tv_preview_isyarat.text.length > 100) {
+//                tv_preview_isyarat.text = label
+//            }
+            if(lastLabel != label){
+                time = System.currentTimeMillis()
+            }
+            if(submittedLabel == label){
+                time = System.currentTimeMillis()
+            }
+            if(lastLabel == label || submittedLabel != label){
+                viewModel.newMessageText.set(tobeSubmitted+label)
+            }
+            lastLabel = label
+            Log.d("System.currentTimeMillis", (System.currentTimeMillis() - time).toString())
+            if (System.currentTimeMillis() - time >= 500) {
+                // Some tweaks that j appear too much, so it take longer time
+                if(label=="j"){
+                    if(System.currentTimeMillis() - time >= 1000){
+                        if (label.length == 1 && submittedLabel.length==1) {
+                            tobeSubmitted += label
+                        }else{
+                            tobeSubmitted += " $label"
+                        }
+                        submittedLabel = label
+                        time = System.currentTimeMillis()
+                    }
+                }else{
+                    if (label.length == 1 && submittedLabel.length==1) {
+                        tobeSubmitted += label
+                    }else{
+                        tobeSubmitted += " $label"
+                    }
+                    submittedLabel = label
+                    time = System.currentTimeMillis()
                 }
             }
-            ++handIndex
         }
     }
 

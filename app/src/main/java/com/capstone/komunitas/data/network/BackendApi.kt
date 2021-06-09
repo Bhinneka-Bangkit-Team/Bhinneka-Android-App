@@ -69,8 +69,7 @@ interface BackendApi {
 
             return Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl("http://192.168.1.17:8080/api/")
-//                .baseUrl("https://api-dot-folkloric-ocean-308008.et.r.appspot.com/api/")
+                .baseUrl("https://api-dot-folkloric-ocean-308008.et.r.appspot.com/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(BackendApi::class.java)

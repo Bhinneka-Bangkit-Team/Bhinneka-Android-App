@@ -173,6 +173,7 @@
                         android:textSize="14sp" />
                 </LinearLayout>
                 <ImageView
+                    android:visibility="invisible"
                     android:id="@+id/bitmap_preview"
                     android:layout_width="300dp"
                     android:layout_height="300dp"

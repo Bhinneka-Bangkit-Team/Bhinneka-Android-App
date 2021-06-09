@@ -15,7 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 
 
 fun Context.toast(message: String){
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+//    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }
 
 fun RecyclerView.show(){

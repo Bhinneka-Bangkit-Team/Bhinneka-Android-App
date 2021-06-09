@@ -3,6 +3,7 @@ package com.capstone.komunitas.ui.chat
 import android.content.Context
 import android.util.Log
 import android.widget.ImageButton
+import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 import com.capstone.komunitas.R
 import com.capstone.komunitas.data.repositories.ChatRepository
@@ -22,7 +23,7 @@ class ChatViewModel(
     context: Context
 ) : ViewModel() {
     var chatListener: ChatListener? = null
-    var newMessageText: String? = null
+    var newMessageText: ObservableField<String> = ObservableField<String>("")
     var audioMessageText: String? = null
     var isRecording: Boolean = false
     val audioRecord = AudioRecordingEngine(context.applicationContext)
@@ -70,22 +71,25 @@ class ChatViewModel(
     fun sendMessagePressed() {
         chatListener?.onSendStarted()
         // Username or password is empty
-        if (newMessageText.isNullOrEmpty()) {
+        if (newMessageText.get()!!.isEmpty()) {
             chatListener?.onSendFailure("Pesan tidak boleh kosong")
             return
         }
-        sendMessage(newMessageText!!,0)
+        sendMessage(newMessageText.get()!!, 0)
+        newMessageText.set("")
     }
 
-    fun sendMessage(messageText:String, isSpeaker: Int){
+    fun sendMessage(messageText: String, isSpeaker: Int) {
+        if (messageText.isEmpty()) {
+            return
+        }
         // Call api via kotlin coroutines
         Coroutines.main {
             try {
                 val chatResponse = repository.sendChat(messageText, isSpeaker)
                 chatResponse?.let {
                     if (it.data!!.size > 0) {
-//                        speechChat(messageText)
-                        if(isSpeaker==1){
+                        if (isSpeaker == 0) {
                             downloadAudio(messageText)
                         }
                         repository.saveChat(it.data)
@@ -99,7 +103,8 @@ class ChatViewModel(
             } catch (e: NoInternetException) {
                 chatListener?.onSendFailure(e.message!!)
             }
-        }}
+        }
+    }
 
     fun sendAudio(body: MultipartBody.Part, lang: RequestBody) {
         chatListener?.onSendStarted()
@@ -110,7 +115,9 @@ class ChatViewModel(
                 responseTTS?.let {
                     if (it.statusCode?.equals(200) == true) {
                         chatListener?.onSendSuccess("Berhasil mengambil audio pesan ${it.data}")
-                        sendMessage(it.data!!, 1)
+                        if (it.data!!.length > 0) {
+                            sendMessage(it.data!!, 1)
+                        }
                         return@main
                     }
                 }
@@ -123,7 +130,7 @@ class ChatViewModel(
         }
     }
 
-    fun listenAudio(text: String?, replayChat: ImageButton){
+    fun listenAudio(text: String?, replayChat: ImageButton) {
         chatListener?.onGetStarted()
         replayChat.setImageResource(R.drawable.ic_pause_softerblue)
         Coroutines.main {

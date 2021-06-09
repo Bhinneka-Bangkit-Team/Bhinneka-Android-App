@@ -71,6 +71,7 @@ class ChatNoVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
 
     private fun initRecyclerView(chatItem: List<Chat>, viewModel: ChatViewModel) {
         val groupAdapter = GroupieAdapter()
+        groupAdapter.spanSizeLookup.apply {  }
 
         if(chatItem.isEmpty()){
             layout_chat_novid_nodata.show()
