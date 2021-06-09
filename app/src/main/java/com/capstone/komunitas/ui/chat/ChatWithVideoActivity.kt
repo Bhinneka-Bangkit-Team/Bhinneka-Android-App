@@ -190,9 +190,11 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
 //            mpImageBitmap = AndroidPacketGetter.getBitmapFromRgba(packet)
             if (System.currentTimeMillis() - time >= 1000) {
                 time = System.currentTimeMillis()
-                viewModel.sendMessage(tobeSubmitted,0)
+                viewModel.sendMessage(tobeSubmitted, 0)
+                if (tobeSubmitted.length != 0) {
+                    viewModel.newMessageText.set("")
+                }
                 tobeSubmitted = ""
-                viewModel.newMessageText.set("")
                 lastLabel = ""
                 submittedLabel = ""
             }
@@ -351,33 +353,33 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
 //            if (tv_preview_isyarat.text.length > 100) {
 //                tv_preview_isyarat.text = label
 //            }
-            if(lastLabel != label){
+            if (lastLabel != label) {
                 time = System.currentTimeMillis()
             }
-            if(submittedLabel == label){
+            if (submittedLabel == label) {
                 time = System.currentTimeMillis()
             }
-            if(lastLabel == label || submittedLabel != label){
-                viewModel.newMessageText.set(tobeSubmitted+label)
+            if (lastLabel == label || submittedLabel != label) {
+                viewModel.newMessageText.set(tobeSubmitted + label)
             }
             lastLabel = label
             Log.d("System.currentTimeMillis", (System.currentTimeMillis() - time).toString())
             if (System.currentTimeMillis() - time >= 500) {
                 // Some tweaks that j appear too much, so it take longer time
-                if(label=="j"){
-                    if(System.currentTimeMillis() - time >= 1000){
-                        if (label.length == 1 && submittedLabel.length==1) {
+                if (label == "j") {
+                    if (System.currentTimeMillis() - time >= 1000) {
+                        if (label.length == 1 && submittedLabel.length == 1) {
                             tobeSubmitted += label
-                        }else{
+                        } else {
                             tobeSubmitted += " $label"
                         }
                         submittedLabel = label
                         time = System.currentTimeMillis()
                     }
-                }else{
-                    if (label.length == 1 && submittedLabel.length==1) {
+                } else {
+                    if (label.length == 1 && submittedLabel.length == 1) {
                         tobeSubmitted += label
-                    }else{
+                    } else {
                         tobeSubmitted += " $label"
                     }
                     submittedLabel = label
