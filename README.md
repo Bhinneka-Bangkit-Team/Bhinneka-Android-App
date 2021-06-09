@@ -39,8 +39,6 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
   </ol>
@@ -85,8 +83,8 @@ $ git://github.com/Bhinneka-Bangkit-Team/Bhinneka-Android-App.git
 1. Download and install [Android Studio](https://developer.android.com/studio)
 
 2. Add the Mediapipe library to your worksapce from [Mediapipe](https://google.github.io/mediapipe/getting_started/android)
-3. 
-4. Install library from [gradle/app](https://github.com/Bhinneka-Bangkit-Team/Bhinneka-Android-App/blob/main/app/build.gradle) on Android Studio
+
+3. Install library from [gradle/app](https://github.com/Bhinneka-Bangkit-Team/Bhinneka-Android-App/blob/main/app/build.gradle) on Android Studio
 
 
 ## Contributing
