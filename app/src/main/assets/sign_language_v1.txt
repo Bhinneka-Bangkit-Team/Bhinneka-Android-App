@@ -48,7 +48,7 @@ z
 Aku
 Kamu
 Dia
-Selamat
+Selamat 
 pagi
 sore
 malam
@@ -71,7 +71,7 @@ Tulis
 Lihat
 Doa
 Buku
-Main
+Main 
 Beli
 Baju
 Hidup
@@ -89,3 +89,4 @@ Tinggi
 Pendek
 Saat
 Ingin
+maaf
