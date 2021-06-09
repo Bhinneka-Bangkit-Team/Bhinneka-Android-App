@@ -3,13 +3,11 @@ package com.capstone.komunitas.util
 import android.app.Activity
 import android.content.Context
 import android.graphics.Rect
-import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 
