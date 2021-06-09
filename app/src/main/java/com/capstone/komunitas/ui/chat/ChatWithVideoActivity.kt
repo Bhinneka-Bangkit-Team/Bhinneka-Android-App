@@ -333,7 +333,7 @@ class ChatWithVideoActivity : AppCompatActivity(), ChatListener, KodeinAware {
         }
         fullLandmarksData = leftHandLandmark + rightHandLandmark
 
-        val outputArray = arrayOf(FloatArray(91))
+        val outputArray = arrayOf(FloatArray(92))
         fullLandmarksData.unwindListToByteBuffer(tfliteInputBuffer)
         tfliteInterpreter.run(tfliteInputBuffer, outputArray)
         var labelResult = outputArray[0].getTopLabel(associatedAxisLabels)
