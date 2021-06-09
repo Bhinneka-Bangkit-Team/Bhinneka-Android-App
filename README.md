@@ -49,20 +49,18 @@
 </details>
 
 ##
-<p align="center">
-<img src="https://github.com/Bhinneka-Bangkit-Team/Bhinneka-Android-App/blob/main/Untitled.jpg" alt="Logo" width="250" height="500">
-</p>
+## About The Project
+Homepage           |  Speech-Text Feature          |  Text-Speech Feature        | Sign Language-Speech Feature
+:-------------------------:|:-------------------------: |:-------------------------:|:-------------------------:
+![](https://github.com/Bhinneka-Bangkit-Team/Bhinneka-MachineLearning-Research/blob/main/capss4.jpg) | ![](https://github.com/Bhinneka-Bangkit-Team/Bhinneka-MachineLearning-Research/blob/main/capss3.jpg) | ![](https://github.com/Bhinneka-Bangkit-Team/Bhinneka-MachineLearning-Research/blob/main/capss2.jpg) | ![](https://github.com/Bhinneka-Bangkit-Team/Bhinneka-MachineLearning-Research/blob/main/capss1.jpg)
 
-## About Selaras
-Selaras is a sign language interpreter mobile app, specially tailored to serve the needs of the deaf and HoH community in Indonesia. Selaras have real time sign language interpreter, so that our user can relay their communication well. This is very suitable in a condition where the user can communicate with their close friend, family, or anyone they're comfortable with as long as the user is in a situation where  they can use both hands to do the sign language. When a sentence is successfully constructed, it will get shown on the screen as a chat bubble and immediately get converted into speech so the other party can hear.
+Hello, we want to introduce you to the KOMUNITAS (Komunikasi Tanpa Batas) project, with an app named "SELARAS". Selaras is a sign language interpreter mobile app, specially tailored to serve the needs of the deaf and HoH community in Indonesia with the help of technology. Using chat-based user interface, it is able to convert sign language (SIBI) to text, and then converted into speech with Google Cloud Speech in live !. It also has a feature to listen for conversation using Google Cloud Speech to Text.
 
 ### Built With
-
-
-* [Android](https://developer.android.com/studio)
-* [Kotlin](https://kotlinlang.org)
-* [Tensorflow-lite](https://www.tensorflow.org/lite)
-* [Mediapipe](https://google.github.io/mediapipe/getting_started/android)
+* [Native Android (Kotlin MVVM)](https://developer.android.com)
+* [TensorFlow and TensorFlow Lite](https://tensorflow.org)
+* [Google Mediapipe Framework](https://google.github.io/mediapipe/)
+* [Nestjs (Node.js framework)](https://nestjs.com)
 * [Google Cloud Platform](https://cloud.google.com)
 
 ## Our Feature
